@@ -5,6 +5,7 @@ import platform
 from pprint import pprint
 
 import satoricore
+import satoricore.exts
 
 # Those tags will end up in the __data dict several times
 # _S for Tag
@@ -26,12 +27,7 @@ _STANDARD_EXT = [
 
 class SatoriImage(object):
 
-    def __init__(self, clone=data_dict):
-
-        if data_dict:
-            self.__data = clone
-            return
-
+    def __init__(self):
         self.__data = {}
         self.__data['metadata'] = {}
         self.__data['metadata']['satori'] = {}
@@ -80,7 +76,7 @@ class SatoriImage(object):
         If 'force_create' is enabled and the 'full_path' does not exist, a dict is automatically created for that path
         """
         # Eliminate trailing '/' to make splitting easier
-        if full_path.endswith('/'):
+        if full_path.endswith(os.sep):
             full_path = full_path[:-1]
         # Get a list from the separated path
         path_tokens = full_path.split(os.sep)
@@ -130,10 +126,10 @@ if __name__ == '__main__':
     # si.add_file('/etc')
     si.add_file('/etc/passwd/')
     si.add_file('/dev/random')
-    si.add_file('/etc/shadow')
-    sres = os.stat('/etc/shadow')
-    si.set_attribute('/etc/shadow', sres, 'stat')
-    si.set_attribute('/etc/shadow', sres.st_size, _SIZE_S)
+    si.add_file('/etc/sudoers')
+    sres = os.stat('/etc/sudoers')
+    si.set_attribute('/etc/sudoers', sres, 'stat')
+    si.set_attribute('/etc/sudoers', sres.st_size, _SIZE_S)
     # print si.__data
     si._test_print('data')
 
