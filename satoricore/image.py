@@ -7,6 +7,8 @@ from pprint import pprint
 import satoricore
 
 # Those tags will end up in the __data dict several times
+# _S for Tag
+# _T for Type
 # Here they can be globally minified
 _TYPE_S = 'type'
 _DIRECTORY_T = 'D'
@@ -63,6 +65,9 @@ class SatoriImage(object):
         filedict[_TYPE_S] = _FILE_T
 
     def set_attribute(self, full_path, attr_dict, ext_name, force_create=False):
+        """
+        Adds an attribute to a file specified in the 'full_path', and creates it if it doesn't exist.
+        """
         file_dict = self.__get_file_dict(full_path, force_create=force_create)
         if ext_name not in _STANDARD_EXT:
             self.__data['metadata']['satori']['extensions'].append(ext_name)
@@ -70,6 +75,11 @@ class SatoriImage(object):
         return file_dict
 
     def __get_file_dict(self, full_path, force_create=False):
+        """
+        Returns the 'dict' object for the 'full_path' specified.
+        If 'force_create' is enabled and the 'full_path' does not exist, a dict is automatically created for that path
+        """
+        # Eliminate trailing '/' to make splitting easier
         if full_path.endswith('/'):
             full_path = full_path[:-1]
         # Get a list from the separated path
@@ -110,6 +120,7 @@ class SatoriImage(object):
             pprint(self.__data[key])
         else:
             pprint(self.__data)
+
 
 
 if __name__ == '__main__':
