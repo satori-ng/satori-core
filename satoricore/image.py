@@ -5,7 +5,7 @@ import platform
 from pprint import pprint
 
 import satoricore
-import satoricore.exts
+# import satoricore.exts
 
 # Those tags will end up in the __data dict several times
 # _S for Tag
@@ -23,6 +23,13 @@ _STANDARD_EXT = [
     _SIZE_S,
     _TYPE_S,
 ]
+
+
+class FileNotFoundError(Exception):
+    pass
+
+class NotADirectoryError(Exception):
+    pass
 
 
 class SatoriImage(object):
