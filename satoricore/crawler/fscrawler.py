@@ -54,7 +54,7 @@ def crawler(root_dir=system_root,
             satori_image.add_file(_dir, type_=_DIRECTORY_T)
 
         for _file in files:
-            mode = stat.S_IFMT(os.stat(_file).st_mode)
+            mode = stat.S_IFMT(os.lstat(_file).st_mode)
             _type = st_mode_mapper.get(mode, _UNKNOWN_T)
             satori_image.add_file(_file, type_=_type)
 
