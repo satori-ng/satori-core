@@ -34,6 +34,7 @@ class NotADirectoryError(Exception):
 
 class SatoriImage(object):
 
+    # listdir = get_dir_contents
     def __init__(self):
         self.__data = {}
         self.__data['metadata'] = {}
@@ -63,9 +64,9 @@ class SatoriImage(object):
         # except :
         #     pass
 
-    def add_file(self, full_path, type=_FILE_T):
+    def add_file(self, full_path, type_=_FILE_T):
         filedict = self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
-        filedict[_TYPE_S] = _FILE_T
+        filedict[_TYPE_S] = type_
 
     def set_attribute(self, full_path, attr_dict, ext_name, force_create=False):
         """
@@ -129,15 +130,15 @@ class SatoriImage(object):
 if __name__ == '__main__':
     si = SatoriImage()
 
-    si.add_file('/')
+    si.add_file('/', type_=_DIRECTORY_T)
     # si.add_file('/etc')
     si.add_file('/etc/passwd/')
     si.add_file('/dev/random')
     si.add_file('/etc/sudoers')
-    sres = os.stat('/etc/sudoers')
-    si.set_attribute('/etc/sudoers', sres, 'stat')
-    si.set_attribute('/etc/sudoers', sres.st_size, _SIZE_S)
+    stat_obj = os.stat('/etc/sudoers')
+    si.set_attribute('/etc/sudoers', stat_obj, 'stat')
+    si.set_attribute('/etc/sudoers', stat_obj.st_size, _SIZE_S)
     # print si.__data
     si._test_print('data')
 
-    print(si.get_dir_contents('/asas'))
+    # print(si.get_dir_contents('/asas'))
