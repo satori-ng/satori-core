@@ -55,6 +55,13 @@ class SatoriImage(object):
         self.__data['metadata']['system']['release'] = platform.release()
         self.__data['metadata']['system']['processor'] = platform.processor()
         self.__data['metadata']['system']['specifics'] = {}
+
+        # create 'path' virtual submodule for 'os' module emulation
+        obj_pack = type("obj_pack", (object,), dict())
+        self.path = obj_pack()
+        setattr(self.path, 'isdir', self._isdir)
+
+
         # try :
         #     self.__data['metadata']['system']['specifics']['win'] = platform.win32_ver()
         # except :
@@ -63,6 +70,21 @@ class SatoriImage(object):
         #     self.__data['metadata']['system']['specifics']['mac'] = platform.mac_ver()
         # except :
         #     pass
+
+    def readlink(self, full_path):
+        file_dict = self.__get_file_dict(full_path, force_create=False)
+        print (file_dict)
+        if _TYPE_S not in file_dict.keys():  # file doesn't exist
+            raise FileNotFoundError("File {} could not be found.".format(full_path))
+        # if file_dict[_TYPE_S] != _DIRECTORY_T
+        return "/not/implemented"
+
+    def _isdir(self, full_path):
+        file_dict = self.__get_file_dict(full_path, force_create=False)
+        print (file_dict)
+        if _TYPE_S not in file_dict.keys():  # file doesn't exist
+            raise FileNotFoundError("File {} could not be found.".format(full_path))
+        return file_dict[_TYPE_S] == _DIRECTORY_T
 
     def add_file(self, full_path, type_=_FILE_T):
         filedict = self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
@@ -77,6 +99,13 @@ class SatoriImage(object):
             self.__data['metadata']['satori']['extensions'].append(ext_name)
         file_dict[ext_name] = attr_dict
         return file_dict
+
+    def get_attribute(self, full_path, ext_name):
+        try :
+            file_dict = self.__get_file_dict(full_path, force_create=False)
+            return file_dict[ext_name]
+        except :
+            raise FileNotFoundError("File {} could not be found.".format(full_path))
 
     def __get_file_dict(self, full_path, force_create=False):
         """
@@ -140,5 +169,11 @@ if __name__ == '__main__':
     si.set_attribute('/etc/sudoers', stat_obj.st_size, _SIZE_S)
     # print si.__data
     si._test_print('data')
-
+    print (si.path.isdir('/etc/passwd'))
     # print(si.get_dir_contents('/asas'))
+
+    from fuse import FUSE, FuseOSError, Operations
+
+    from satoricore.api.os.fused import Passthrough
+    # main()
+    FUSE(Passthrough('/', si), "mountpoint", nothreads=True, foreground=True, nonempty=True, )

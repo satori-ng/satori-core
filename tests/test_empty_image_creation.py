@@ -2,6 +2,7 @@ import unittest
 
 from satoricore.image import SatoriImage
 
+# python -m unittest  discover -v
 
 class test_EmptyImage(unittest.TestCase):
 
@@ -21,3 +22,12 @@ class test_EmptyImage(unittest.TestCase):
         si.add_file("/etc/shadow")
         ret = si.get_dir_contents("/etc")
         self.assertTrue('shadow' in ret)
+
+
+    def test_isdir(self):
+        si = SatoriImage()
+        si.add_file("/etc/shadow")
+        # ret = si.get_dir_contents("/etc")
+
+        self.assertTrue(si.path.isdir('/etc'))
+        self.assertTrue(not si.path.isdir('/etc/shadow'))
