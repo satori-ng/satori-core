@@ -2,30 +2,26 @@ import queue
 import os
 import os.path
 
-import satoricore
-import satoricore.image
+from image import SatoriImage
 
 system_root = os.path.abspath(os.sep)
 __file_queue = queue.Queue()
 
 
-
-def crawler(root_dir = system_root,
-            plugins = None,
-            excluded_dirs = set(),
-            crawled_object = os,
-            satori_image = satoricore.image.SatoriImage(),
+def crawler(root_dir=system_root,
+            plugins=None,
+            excluded_dirs=set(),
+            crawled_object=os,
+            satori_image=SatoriImage(),
             ):
 
     global __file_queue
 
-    # while not __file_queue.empty():
-
-    for f in crawled_object.listdir(root_dir) :
+    for f in crawled_object.listdir(root_dir):
         full_path = os.path.join([root_dir, f])
 
-        if os.path.isdir(full_path) :
-            
+        if os.path.isdir(full_path):
+
             if full_path in excluded_dirs:
                 continue
             __file_queue.put(full_path)
