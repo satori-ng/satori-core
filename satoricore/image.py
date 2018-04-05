@@ -14,6 +14,12 @@ import satoricore
 _TYPE_S = 'type'
 _DIRECTORY_T = 'D'
 _FILE_T = 'F'
+_LINK_T = 'L'
+_BLOCK_DEVICE_T = 'B'
+_CHAR_DEVICE_T = 'C'
+_FIFO_T = 'I'
+_SOCKET_T = 'S'
+_UNKNOWN_T = 'U'
 
 _CONTENTS_S = 'contents'
 _SIZE_S = 'filesize'
@@ -22,6 +28,12 @@ _STANDARD_EXT = [
     _CONTENTS_S,
     _SIZE_S,
     _TYPE_S,
+    _LINK_T,
+    _BLOCK_DEVICE_T,
+    _CHAR_DEVICE_T,
+    _FIFO_T,
+    _SOCKET_T,
+    _UNKNOWN_T,
 ]
 
 
