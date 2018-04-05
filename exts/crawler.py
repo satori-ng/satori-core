@@ -1,49 +1,54 @@
 """
-# Crawler extensions
+Arcane Hook
 
-Please do not open or close system files for scanning.
-Do that with hooking!
+I'm a hooker from Silvermoon City. Let me show you the Arcane way to Python
+NOTE: Use me, use me haaaard...
+Available hooking decorators:
+    @hook("on_start") # Crawler has just started. Fasten your extension's seatbelt!
+    @hook("pre_open") (passes `path=<path: str>`) # File is not open yet... a hard one ;)
+    @hook("with_open") (passes `path=<path: str>, fd=<file descriptor: os.fd`) # File just opened, waiting for your kinky games
+    @hook("post_close") (passes `path=<path: str>`) # File just came...
+    @hook("on_end") # DEATH
 """
-import exts.common
+from exts.common import ExtensionList
 
 _plugins = {
-        "on_start": exts.common.PluginList(),
-        "pre_open": exts.common.PluginList(),
-        "with_open": exts.common.PluginList(),
-        "post_close": exts.common.PluginList(),
-        "on_end": exts.common.PluginList()
+        "on_start": ExtensionList(),
+        "pre_open": ExtensionList(),
+        "with_open": ExtensionList(),
+        "post_close": ExtensionList(),
+        "on_end": ExtensionList()
         }
 
 
-def _add_plugin(func, at):
-    _plugins[at].append(func)
+def hook(key, deps=None):
+    """
+    Crawler hook. Usage:
 
+    foo.py
+        @hook("on_start")
+        def bar():
+            print("I'll be called when crawler starts!")
 
-def on_start(fn):
-    """Function wiil be called when the crawler starts"""
-    _add_plugin(fn, "on_start")
-    return fn
+    test.py
+        @hook("on_start", "foo")
+        def foo():
+            print("I'll be called when crawler starts, but after `foo` hooks!")
 
-
-def pre_open(fn):
-    """Function wiil be called BEFORE the file is opened"""
-    _add_plugin(fn, "pre_open")
-    return fn
-
-
-def with_open(fn):
-    """Function wiil be called while the file is opened"""
-    _add_plugin(fn, "with_open")
-    return fn
-
-
-def post_close(fn):
-    """Function wiil be called after the file is closed"""
-    _add_plugin(fn, "post_close")
-    return fn
-
-
-def on_end(fn):
-    """Function wiil be called when the crawler ends"""
-    _add_plugin(fn, "on_end")
-    return fn
+    anothertest.py
+        @hook("with_open", "test")
+        def foo(path, fd):
+            print("Test module is already executed.")
+            print("Currently processing file %s" % path)
+    """
+    value = _plugins[key]
+    if isinstance(value, ExtensionList) and \
+            (deps is None or isinstance(deps, str) or isinstance(deps, list)):
+        # In case @my_name(), @my_name('dependency') or
+        # @my_name(['dep1', 'dep2']) is used
+        def wrap(fn):
+            fn.__deps__ = deps
+            value.load(fn)
+            return fn
+        return wrap
+    # TODO: Else exception maybe?
