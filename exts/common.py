@@ -1,3 +1,6 @@
+import collections
+
+
 class ExtensionException(Exception):
     pass
 
@@ -21,7 +24,7 @@ class ExtensionList(list):
     def isloaded(self, name):
         if name is None:
             return True
-        if isinstance(name, list):
+        if isinstance(name, collections.Iterable):
             return set(name).issubset(self)
         return name in [x.__module__ for x in self]
 

@@ -10,6 +10,8 @@ Available hooking decorators:
     @hook("post_close") (passes `path=<path: str>`) # File just came...
     @hook("on_end") # DEATH
 """
+import collections
+
 from exts.common import ExtensionList
 
 _plugins = {
@@ -21,7 +23,7 @@ _plugins = {
         }
 
 
-def hook(key, deps=None):
+def hook(key, dependencies=None):
     """
     Crawler hook. Usage:
 
@@ -42,12 +44,16 @@ def hook(key, deps=None):
             print("Currently processing file %s" % path)
     """
     value = _plugins[key]
-    if isinstance(value, ExtensionList) and \
-            (deps is None or isinstance(deps, str) or isinstance(deps, list)):
+    has_valid_dependencies = (
+        dependencies is None or
+        isinstance(dependencies, str) or
+        isinstance(dependencies, collections.Iterable)
+    )
+    if isinstance(value, ExtensionList) and has_valid_dependencies:
         # In case @my_name(), @my_name('dependency') or
         # @my_name(['dep1', 'dep2']) is used
         def wrap(fn):
-            fn.__deps__ = deps
+            fn.__deps__ = dependencies
             value.load(fn)
             return fn
         return wrap
