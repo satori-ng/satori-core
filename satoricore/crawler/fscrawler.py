@@ -2,7 +2,6 @@ import os
 import stat
 
 from satoricore.image import (
-    SatoriImage,
     _LINK_T,
     _BLOCK_DEVICE_T,
     _CHAR_DEVICE_T,
@@ -23,12 +22,7 @@ st_mode_mapper = {
 }
 
 
-def crawler(root_dir=system_root,
-            plugins=None,
-            excluded_dirs=set(),
-            crawled_object=os,
-            satori_image=SatoriImage(),
-            ):
+def crawler(root_dir=system_root, excluded_dirs=set()):
 
     # Iterate over the list from top top bottom so that we may edit the list
     # of directories to be traversed according to the list of excluded dirs.
@@ -51,11 +45,11 @@ def crawler(root_dir=system_root,
         files = [os.path.join(root, f) for f in _files]
 
         for _dir in dirs:
-            satori_image.add_file(_dir, type_=_DIRECTORY_T)
+            dir_stat = os.lstat(_dir)
+            yield (_dir, _DIRECTORY_T, dir_stat)
 
         for _file in files:
-            mode = stat.S_IFMT(os.lstat(_file).st_mode)
+            file_stat = os.lstat(_file)
+            mode = stat.S_IFMT(file_stat.st_mode)
             _type = st_mode_mapper.get(mode, _UNKNOWN_T)
-            satori_image.add_file(_file, type_=_type)
-
-    return satori_image
+            yield (_file, _type, file_stat)
