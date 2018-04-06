@@ -51,8 +51,12 @@ class BaseCrawler:
 
         if not entrypoints_valid:
             raise Exception('Invalid list of entrypoints provided')
+
         self.entrypoints = entrypoints
-        self.excluded_dirs = excluded_dirs
+        self.excluded_dirs = [
+            d.rstrip(os.path.sep)
+            for d in excluded_dirs
+        ]
 
     def _iter_entrypoints(self):
         for entrypoint in self.entrypoints:
