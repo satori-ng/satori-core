@@ -1,3 +1,4 @@
+import inspect
 import collections
 
 
@@ -19,6 +20,12 @@ class ExtensionList(list):
         for fn in self:
             print('Calling %s from module %s with args: %s and kwargs: %s' %
                   (fn.__name__, fn.__module__, args, kwargs))
+            # Skip extension if it doens't accept the arguments passed
+            try:
+                inspect.getcallargs(fn, *args, **kwargs)
+            except TypeError:
+                # TODO: Add logging for skipped extensions
+                continue
             fn(*args, **kwargs)
 
     def isloaded(self, name):
