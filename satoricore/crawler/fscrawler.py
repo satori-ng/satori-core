@@ -11,8 +11,6 @@ from satoricore.image import (
     _DIRECTORY_T
 )
 
-system_root = os.path.abspath(os.sep)
-
 st_mode_mapper = {
     stat.S_IFBLK: _BLOCK_DEVICE_T,
     stat.S_IFCHR: _CHAR_DEVICE_T,
@@ -22,7 +20,7 @@ st_mode_mapper = {
 }
 
 
-def crawler(root_dir=system_root, excluded_dirs=set()):
+def crawler(root_dir, excluded_dirs=set()):
 
     # Iterate over the list from top top bottom so that we may edit the list
     # of directories to be traversed according to the list of excluded dirs.
