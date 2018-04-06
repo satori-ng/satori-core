@@ -1,5 +1,8 @@
 import os
 import stat
+import operator
+import functools
+import collections
 
 from satoricore.image import (
     _LINK_T,
@@ -20,34 +23,48 @@ st_mode_mapper = {
 }
 
 
-def crawler(root_dir, excluded_dirs=set()):
+def crawler(entrypoints, excluded_dirs=set()):
 
-    # Iterate over the list from top top bottom so that we may edit the list
-    # of directories to be traversed according to the list of excluded dirs.
-    for _root, _dirs, _files in os.walk(root_dir, topdown=True):
+    if not isinstance(entrypoints, collections.Iterable):
+        entrypoints = [entrypoints]
 
-        root = os.path.abspath(_root)
-        # TODO: This is most probably not needed. Remove after further testing.
-        if root in excluded_dirs:
-            continue
+    entrypoints_valid = functools.reduce(
+        operator.and_,
+        [isinstance(entrypoint, str) for entrypoint in entrypoints]
+    )
 
-        # Edit _dirs inplace to avoid iterating over subdirectories of
-        # directories in the excluded_dirs iterable.
-        # Only works with topdown=True
-        _dirs[:] = [
-            d
-            for d in _dirs
-            if os.path.join(root, d) not in excluded_dirs
-        ]
-        dirs = [os.path.join(root, d) for d in _dirs]
-        files = [os.path.join(root, f) for f in _files]
+    if not entrypoints_valid:
+        return
 
-        for _dir in dirs:
-            dir_stat = os.lstat(_dir)
-            yield (_dir, _DIRECTORY_T, dir_stat)
+    for entrypoint in entrypoints:
+        # Iterate over the list from top top bottom so that we may edit the
+        # list of directories to be traversed according to the list of excluded
+        # dirs.
+        for _root, _dirs, _files in os.walk(entrypoint, topdown=True):
 
-        for _file in files:
-            file_stat = os.lstat(_file)
-            mode = stat.S_IFMT(file_stat.st_mode)
-            _type = st_mode_mapper.get(mode, _UNKNOWN_T)
-            yield (_file, _type, file_stat)
+            root = os.path.abspath(_root)
+            # TODO: This is most probably not needed. Remove after further
+            # testing.
+            if root in excluded_dirs:
+                continue
+
+            # Edit _dirs inplace to avoid iterating over subdirectories of
+            # directories in the excluded_dirs iterable.
+            # Only works with topdown=True
+            _dirs[:] = [
+                d
+                for d in _dirs
+                if os.path.join(root, d) not in excluded_dirs
+            ]
+            dirs = [os.path.join(root, d) for d in _dirs]
+            files = [os.path.join(root, f) for f in _files]
+
+            for _dir in dirs:
+                dir_stat = os.lstat(_dir)
+                yield (_dir, _DIRECTORY_T, dir_stat)
+
+            for _file in files:
+                file_stat = os.lstat(_file)
+                mode = stat.S_IFMT(file_stat.st_mode)
+                _type = st_mode_mapper.get(mode, _UNKNOWN_T)
+                yield (_file, _type, file_stat)
