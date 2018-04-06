@@ -23,48 +23,67 @@ st_mode_mapper = {
 }
 
 
-def crawler(entrypoints, excluded_dirs=set()):
+class BaseCrawler:
+    """
+    A basic filesystem crawler. Iterates recursively over the specified
+    entrypoints and yields file/folder name, type, and the structure returned
+    by os.lstat.
 
-    if not isinstance(entrypoints, collections.Iterable):
-        entrypoints = [entrypoints]
+    Examples:
+        crawler = BaseCrawler('/')
+        for filename, filetype, filestats in crawler():
+            # Do stuff
 
-    entrypoints_valid = functools.reduce(
-        operator.and_,
-        [isinstance(entrypoint, str) for entrypoint in entrypoints]
-    )
+        crawler = BaseCrawler(['C:\\', 'D:\\Backup'], ['C:\\Users\\Admin'])
+        for filename, filetype, filestats in crawler():
+            # Do stuff
+    """
 
-    if not entrypoints_valid:
-        return
+    def __init__(self, entrypoints, excluded_dirs=set()):
 
-    for entrypoint in entrypoints:
-        # Iterate over the list from top top bottom so that we may edit the
-        # list of directories to be traversed according to the list of excluded
-        # dirs.
-        for _root, _dirs, _files in os.walk(entrypoint, topdown=True):
+        if not isinstance(entrypoints, collections.Iterable):
+            entrypoints = [entrypoints]
 
-            root = os.path.abspath(_root)
-            # TODO: This is most probably not needed. Remove after further
-            # testing.
-            if root in excluded_dirs:
-                continue
+        entrypoints_valid = functools.reduce(
+            operator.and_,
+            [isinstance(entrypoint, str) for entrypoint in entrypoints]
+        )
 
-            # Edit _dirs inplace to avoid iterating over subdirectories of
-            # directories in the excluded_dirs iterable.
-            # Only works with topdown=True
-            _dirs[:] = [
-                d
-                for d in _dirs
-                if os.path.join(root, d) not in excluded_dirs
-            ]
-            dirs = [os.path.join(root, d) for d in _dirs]
-            files = [os.path.join(root, f) for f in _files]
+        if not entrypoints_valid:
+            raise Exception('Invalid list of entrypoints provided')
+        self.entrypoints = entrypoints
+        self.excluded_dirs = excluded_dirs
 
-            for _dir in dirs:
-                dir_stat = os.lstat(_dir)
-                yield (_dir, _DIRECTORY_T, dir_stat)
+    def __call__(self):
+        for entrypoint in self.entrypoints:
+            # Iterate over the list from top top bottom so that we may edit the
+            # list of directories to be traversed according to the list of
+            # excluded dirs.
+            for _root, _dirs, _files in os.walk(entrypoint, topdown=True):
 
-            for _file in files:
-                file_stat = os.lstat(_file)
-                mode = stat.S_IFMT(file_stat.st_mode)
-                _type = st_mode_mapper.get(mode, _UNKNOWN_T)
-                yield (_file, _type, file_stat)
+                root = os.path.abspath(_root)
+                # TODO: This is most probably not needed. Remove after further
+                # testing.
+                if root in self.excluded_dirs:
+                    continue
+
+                # Edit _dirs inplace to avoid iterating over subdirectories of
+                # directories in the excluded_dirs iterable.
+                # Only works with topdown=True
+                _dirs[:] = [
+                    d
+                    for d in _dirs
+                    if os.path.join(root, d) not in self.excluded_dirs
+                ]
+                dirs = [os.path.join(root, d) for d in _dirs]
+                files = [os.path.join(root, f) for f in _files]
+
+                for _dir in dirs:
+                    dir_stat = os.lstat(_dir)
+                    yield (_dir, _DIRECTORY_T, dir_stat)
+
+                for _file in files:
+                    file_stat = os.lstat(_file)
+                    mode = stat.S_IFMT(file_stat.st_mode)
+                    _type = st_mode_mapper.get(mode, _UNKNOWN_T)
+                    yield (_file, _type, file_stat)
