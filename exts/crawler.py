@@ -12,7 +12,7 @@ Available hooking decorators:
 """
 from exts.common import ExtensionList
 
-_plugins = {
+_extensions = {
         "on_start": ExtensionList(),
         "pre_open": ExtensionList(),
         "with_open": ExtensionList(),
@@ -41,7 +41,7 @@ def hook(key, deps=None):
             print("Test module is already executed.")
             print("Currently processing file %s" % path)
     """
-    value = _plugins[key]
+    value = _extensions[key]
     if isinstance(value, ExtensionList) and \
             (deps is None or isinstance(deps, str) or isinstance(deps, list)):
         # In case @my_name(), @my_name('dependency') or

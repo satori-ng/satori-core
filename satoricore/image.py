@@ -12,15 +12,6 @@ import satoricore
 # _T for Type
 # Here they can be globally minified
 _TYPE_S = 'type'
-_DIRECTORY_T = 'D'
-_FILE_T = 'F'
-_LINK_T = 'L'
-_BLOCK_DEVICE_T = 'B'
-_CHAR_DEVICE_T = 'C'
-_FIFO_T = 'I'
-_SOCKET_T = 'S'
-_UNKNOWN_T = 'U'
-
 _CONTENTS_S = 'contents'
 _SIZE_S = 'filesize'
 
@@ -28,12 +19,6 @@ _STANDARD_EXT = [
     _CONTENTS_S,
     _SIZE_S,
     _TYPE_S,
-    _LINK_T,
-    _BLOCK_DEVICE_T,
-    _CHAR_DEVICE_T,
-    _FIFO_T,
-    _SOCKET_T,
-    _UNKNOWN_T,
 ]
 
 
@@ -79,10 +64,9 @@ class SatoriImage(object):
         # except :
         #     pass
 
-    def add_file(self, full_path, type_=_FILE_T):
+    def add_file(self, full_path):
         filedict = self.set_attribute(full_path, {},
                                       _CONTENTS_S, force_create=True)
-        filedict[_TYPE_S] = type_
 
     def set_attribute(self, full_path, attr_dict,
                       ext_name, force_create=False):
@@ -111,21 +95,25 @@ class SatoriImage(object):
         # path_tokens = [token for token in path_tokens if token]
         cur_position = self.__data['data']['filesystem']
         for token in path_tokens[:-1]:
-            if force_create:
-                try:
-                    # Try Accessing directory contents
-                    if _CONTENTS_S not in cur_position[token].keys():
-                        raise NotADirectoryError(
-                                "File: '{}' in Path: '{}' is not a Directory"
-                                .format(token, full_path))
-                    # cur_position[token][_CONTENTS_S]
-                except KeyError:
-                    # Directory doesn't exist - create it
-                    cur_position[token] = {
-                        _CONTENTS_S: {},
-                        _TYPE_S: _DIRECTORY_T,
-                    }
+            if not force_create:
+                continue
+
+            try:
+                # Try Accessing directory contents
+                if _CONTENTS_S not in cur_position[token].keys():
+                    raise NotADirectoryError(
+                            "File: '{}' in Path: '{}' is not a Directory"
+                            .format(token, full_path))
+                # cur_position[token][_CONTENTS_S]
+            except KeyError:
+                # Directory doesn't exist - create it
+                cur_position[token] = {
+                    _CONTENTS_S: {},
+                    _TYPE_S: _DIRECTORY_T,
+                }
+
             cur_position = cur_position[token][_CONTENTS_S]
+
         # Create a file as an empty dict
         file_token = path_tokens[-1]
         if file_token not in cur_position.keys():
@@ -146,11 +134,17 @@ class SatoriImage(object):
         else:
             pprint(self.__data)
 
+    def __str__(self):
+        return self.__data.__str__()
+
+    def __repr__(self):
+        return self.__data.__repr__()
+
 
 if __name__ == '__main__':
     si = SatoriImage()
 
-    si.add_file('/', type_=_DIRECTORY_T)
+    si.add_file('/')
     # si.add_file('/etc')
     si.add_file('/etc/passwd/')
     si.add_file('/dev/random')
