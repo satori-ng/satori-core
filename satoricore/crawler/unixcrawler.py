@@ -1,3 +1,5 @@
+import collections
+
 from .basecrawler import BaseCrawler
 
 
@@ -11,12 +13,14 @@ class UnixCrawler(BaseCrawler):
         /dev
         /tmp
     """
-    def __init__(self, entrypoints, excluded_dirs=set()):
-        excluded_dirs.union([
+    def __init__(self, entrypoints, excluded_dirs):
+        _excluded_dirs = {
             '/proc',
             '/sys',
             '/dev',
             '/tmp'
-        ])
+        }
+        if isinstance(excluded_dirs, collections.Iterable):
+            _excluded_dirs = _excluded_dirs.union(excluded_dirs)
 
-        super().__init__(entrypoints, excluded_dirs)
+        super().__init__(entrypoints, _excluded_dirs)

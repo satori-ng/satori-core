@@ -39,7 +39,7 @@ class BaseCrawler:
             # Do stuff
     """
 
-    def __init__(self, entrypoints, excluded_dirs=set()):
+    def __init__(self, entrypoints, excluded_dirs):
 
         if not isinstance(entrypoints, collections.Iterable):
             entrypoints = [entrypoints]
@@ -51,6 +51,9 @@ class BaseCrawler:
 
         if not entrypoints_valid:
             raise Exception('Invalid list of entrypoints provided')
+
+        if excluded_dirs is None:
+            excluded_dirs = set()
 
         self.entrypoints = entrypoints
         self.excluded_dirs = [
