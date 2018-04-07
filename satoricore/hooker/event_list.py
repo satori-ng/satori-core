@@ -2,20 +2,20 @@ import inspect
 import collections
 
 
-class ExtensionException(Exception):
+class EventException(Exception):
     pass
 
 
-class ExtensionList(list):
+class EventList(list):
     # If an extension is loaded before all its dependencies are loaded, put it
     # in this list and try to load it again after loading more extensions
     later = []
 
     def __call__(self, *args, **kwargs):
-        if len(self.later) > 0:
-            raise ExtensionException(
-                    "Dependencies not met for: %s" %
-                    [x.__name__ + ":" + x.__module__ for x in self.later])
+        if not self.later:
+            raise EventException(
+                "Dependencies not met for: %s" %
+                [x.__name__ + ":" + x.__module__ for x in self.later])
 
         for fn in self:
             print('Calling %s from module %s with args: %s and kwargs: %s' %
@@ -29,6 +29,7 @@ class ExtensionList(list):
             fn(*args, **kwargs)
 
     def isloaded(self, name):
+        """Checks if given hook module has been loaded"""
         if name is None:
             return True
         if isinstance(name, collections.Iterable):
@@ -36,6 +37,7 @@ class ExtensionList(list):
         return name in [x.__module__ for x in self]
 
     def load(self, fn):
+        """Tries to load a hook"""
         if self.isloaded(fn.__deps__):
             self.append(fn)
         else:
