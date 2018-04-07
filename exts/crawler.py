@@ -10,18 +10,20 @@ Available hooking decorators:
     @hook("post_close") (passes `path=<path: str>`) # File just came...
     @hook("on_end") # DEATH
 """
+import collections
+
 from exts.common import ExtensionList
 
 _plugins = {
-        "on_start": ExtensionList(),
-        "pre_open": ExtensionList(),
-        "with_open": ExtensionList(),
-        "post_close": ExtensionList(),
-        "on_end": ExtensionList()
-        }
+    "on_start": ExtensionList(),
+    "pre_open": ExtensionList(),
+    "with_open": ExtensionList(),
+    "post_close": ExtensionList(),
+    "on_end": ExtensionList()
+}
 
 
-def hook(key, deps=None):
+def hook(key, dependencies=None):
     """
     Crawler hook. Usage:
 
@@ -41,14 +43,23 @@ def hook(key, deps=None):
             print("Test module is already executed.")
             print("Currently processing file %s" % path)
     """
-    value = _plugins[key]
-    if isinstance(value, ExtensionList) and \
-            (deps is None or isinstance(deps, str) or isinstance(deps, list)):
-        # In case @my_name(), @my_name('dependency') or
-        # @my_name(['dep1', 'dep2']) is used
-        def wrap(fn):
-            fn.__deps__ = deps
-            value.load(fn)
-            return fn
-        return wrap
-    # TODO: Else exception maybe?
+    extension_list = _plugins.get(key, None)
+    if extension_list is None:
+        raise Exception(
+            'Invalid key provided. Valid options: %s' %
+            ', '.join(_plugins.keys())
+        )
+
+    has_valid_dependencies = (
+        dependencies is None or
+        isinstance(dependencies, str) or
+        isinstance(dependencies, collections.Iterable)
+    )
+    if not has_valid_dependencies:
+        raise Exception('Invalid list of dependencies provided with `hook`')
+
+    def wrapper(fn):
+        fn.__deps__ = dependencies
+        extension_list.load(fn)
+        return fn
+    return wrapper
