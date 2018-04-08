@@ -1,67 +1,15 @@
-"""
-Arcane Hooker
+from satoricore.hooker.event_list import EventList
 
-I'm a hooker from Silvermoon City. Let me show you the Arcane way to Python
-NOTE: Use me, use me haaaard...
-
-This is my attempt to reinvent the hooking wheel.
-I try to keep it simple for both providers and consumers.
-
-The whole idea is that there events, created by the guts of the app
-by `_events["my_event_name"] = HookList()` on runtime.
-Then, the required plugins/addons/extensions/potatomonkeys are imported
-and actually hook on the created event(s).
-For more info on how to do that, check the `hook` method.
-"""
-import collections
-
-from satoricore.hooker.hook_list import HookList
-
-_events = {
-    "on_start": HookList(),
-    "pre_open": HookList(),
-    "with_open": HookList(),
-    "post_close": HookList(),
-    "on_end": HookList()
-}
+EVENTS = EventList()
+# events.append(["on_start", "pre_open", "with_open", "post_close", "on_end"])
 
 
-def hook(key, dependencies=None):
-    """
-    Crawler hook. Usage:
+def hook(event, dependencies=None):
+    """Hooking decorator. Just `@hook(event, dependencies) on your function`"""
 
-    foo.py
-        @hook("on_start")
-        def bar():
-            print("I'll be called when crawler starts!")
-
-    test.py
-        @hook("on_start", "foo")
-        def foo():
-            print("I'll be called when crawler starts, but after `foo` hooks!")
-
-    anothertest.py
-        @hook("with_open", "test")
-        def foo(path, fd):
-            print("Test module is already executed.")
-            print("Currently processing file %s" % path)
-    """
-    event_list = _events.get(key, None)
-    if event_list is None:
-        raise Exception(
-            'Invalid key provided. Valid options: %s' %
-            ', '.join(_events.keys())
-        )
-
-    has_valid_dependencies = (
-        dependencies is None or
-        isinstance(dependencies, (collections.Iterable, str))
-    )
-    if not has_valid_dependencies:
-        raise Exception('Invalid list of dependencies provided with `hook`')
-
-    def wrapper(fn):
-        fn.__deps__ = dependencies
-        event_list.load(fn)
-        return fn
+    def wrapper(func):
+        """I'm a simple wrapper that manages event hooking"""
+        func.__deps__ = dependencies
+        EVENTS.hook(event, func, dependencies)
+        return func
     return wrapper

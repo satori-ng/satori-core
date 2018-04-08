@@ -1,12 +1,15 @@
+"""The HookList class"""
 import inspect
-import collections
+from collections import Iterable
 
 
 class HookException(Exception):
+    """A hook threw up!"""
     pass
 
 
 class HookList(list):
+    """Profesional grade list of hooks. Manages dependcy checking n' shit"""
     # If an extension is loaded before all its dependencies are loaded, put it
     # in this list and try to load it again after loading more extensions
     later = []
@@ -15,35 +18,42 @@ class HookList(list):
         if not self.later:
             raise HookException(
                 "Dependencies not met for: %s" %
-                [x.__name__ + ":" + x.__module__ for x in self.later])
+                ", ".join([x.__name__ + ":" + x.__module__
+                           for x in self.later]))
 
-        for fn in self:
+        for func in self:
             print('Calling %s from module %s with args: %s and kwargs: %s' %
-                  (fn.__name__, fn.__module__, args, kwargs))
+                  (func.__name__, func.__module__, args, kwargs))
             # Skip extension if it doens't accept the arguments passed
             try:
-                inspect.getcallargs(fn, *args, **kwargs)
+                inspect.signature(func).bind(*args, **kwargs)
             except TypeError:
                 # TODO: Add logging for skipped extensions
                 continue
-            fn(*args, **kwargs)
+            func(*args, **kwargs)
 
     def isloaded(self, name):
         """Checks if given hook module has been loaded"""
         if name is None:
             return True
-        if isinstance(name, collections.Iterable):
+        if isinstance(name, Iterable):
             return set(name).issubset(self)
         return name in [x.__module__ for x in self]
 
-    def load(self, fn):
+    def hook(self, function, dependencies=None):
         """Tries to load a hook"""
-        if self.isloaded(fn.__deps__):
-            self.append(fn)
+        if not isinstance(dependencies, (Iterable, type(None), str)):
+            raise HookException("Invalid list of dependencies provided!")
+
+        if not hasattr(function, "__deps__"):
+            function.__deps__ = dependencies
+
+        if self.isloaded(function.__deps__):
+            self.append(function)
         else:
-            self.later.append(fn)
+            self.later.append(function)
 
         for ext in self.later:
             if self.isloaded(ext.__deps__):
                 self.later.remove(ext)
-                self.load(ext)
+                self.hook(ext)
