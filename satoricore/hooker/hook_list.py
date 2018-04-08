@@ -2,18 +2,18 @@ import inspect
 import collections
 
 
-class EventException(Exception):
+class HookException(Exception):
     pass
 
 
-class EventList(list):
+class HookList(list):
     # If an extension is loaded before all its dependencies are loaded, put it
     # in this list and try to load it again after loading more extensions
     later = []
 
     def __call__(self, *args, **kwargs):
         if not self.later:
-            raise EventException(
+            raise HookException(
                 "Dependencies not met for: %s" %
                 [x.__name__ + ":" + x.__module__ for x in self.later])
 

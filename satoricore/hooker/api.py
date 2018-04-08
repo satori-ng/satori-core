@@ -8,21 +8,21 @@ This is my attempt to reinvent the hooking wheel.
 I try to keep it simple for both providers and consumers.
 
 The whole idea is that there events, created by the guts of the app
-by `_events["my_event_name"] = EventList()` on runtime.
+by `_events["my_event_name"] = HookList()` on runtime.
 Then, the required plugins/addons/extensions/potatomonkeys are imported
 and actually hook on the created event(s).
 For more info on how to do that, check the `hook` method.
 """
 import collections
 
-from satoricore.hooker.common import EventList
+from satoricore.hooker.hook_list import HookList
 
 _events = {
-    "on_start": EventList(),
-    "pre_open": EventList(),
-    "with_open": EventList(),
-    "post_close": EventList(),
-    "on_end": EventList()
+    "on_start": HookList(),
+    "pre_open": HookList(),
+    "with_open": HookList(),
+    "post_close": HookList(),
+    "on_end": HookList()
 }
 
 
