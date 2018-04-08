@@ -1,7 +1,10 @@
-Arcane Hooker
+# Arcane Hooker
 
 I'm a hooker from Silvermoon City. Let me show you the Arcane way to Python
+
 NOTE: Use me, use me haaaard...
+
+---
 
 This is my attempt to reinvent the hooking wheel.
 I try to keep it simple for both providers and consumers.
@@ -11,8 +14,8 @@ or an plugin itself on runtime.
 After that, the required plugins that actually implemnt hooks on the events
 should be imported. Example:
 
-main.py
-```
+`main.py`
+```python
 import hooker
 hooker.EVENTS.append(["on_start", "with_open"])
 
@@ -21,15 +24,15 @@ import test
 import anothertest
 ```
 
-foo.py
-```
+`foo.py`
+```python
 @hook("on_start")
 def bar():
 	print("I'll be called when crawler starts!")
 ```
 
-test.py
-```
+`test.py`
+```python
 import hooker
 
 @hook("on_start", "foo")
@@ -37,10 +40,10 @@ def foo():
 	print("I'll be called when crawler starts, but after `foo` hooks!")
 ```
 
-anothertest.py
-```
+`anothertest.py`
+```python
 @hook("with_open", "test")
 def foo(path, fd):
-	print("Test module is already executed.")
-	print("Currently processing file %s" % path)
+	print("This will not work! Dependencies are per-event!")
+	print("`test` module should have a 'with_open' hook as well!")
 ```
