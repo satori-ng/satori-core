@@ -4,22 +4,14 @@ import operator
 import functools
 import collections
 
-from satoricore.image import (
-    _LINK_T,
-    _BLOCK_DEVICE_T,
-    _CHAR_DEVICE_T,
-    _FIFO_T,
-    _SOCKET_T,
-    _UNKNOWN_T,
-    _DIRECTORY_T
-)
+from satoricore.common import _STANDARD_EXT as SE
 
 st_mode_mapper = {
-    stat.S_IFBLK: _BLOCK_DEVICE_T,
-    stat.S_IFCHR: _CHAR_DEVICE_T,
-    stat.S_IFIFO: _FIFO_T,
-    stat.S_IFLNK: _LINK_T,
-    stat.S_IFSOCK: _SOCKET_T,
+    stat.S_IFBLK: SE.BLOCK_DEVICE_T,
+    stat.S_IFCHR: SE.CHAR_DEVICE_T,
+    stat.S_IFIFO: SE.FIFO_T,
+    stat.S_IFLNK: SE.LINK_T,
+    stat.S_IFSOCK: SE.SOCKET_T,
 }
 
 
@@ -91,10 +83,10 @@ class BaseCrawler:
 
             for _dir in dirs:
                 dir_stat = os.lstat(_dir)
-                yield (_dir, _DIRECTORY_T, dir_stat)
+                yield (_dir, SE.DIRECTORY_T, dir_stat)
 
             for _file in files:
                 file_stat = os.lstat(_file)
                 mode = stat.S_IFMT(file_stat.st_mode)
-                _type = st_mode_mapper.get(mode, _UNKNOWN_T)
+                _type = st_mode_mapper.get(mode, SE.UNKNOWN_T)
                 yield (_file, _type, file_stat)
