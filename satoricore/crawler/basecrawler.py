@@ -4,7 +4,19 @@ import operator
 import functools
 import collections
 
+<<<<<<< HEAD
 from satoricore.hooker.defaults.stat import _UNKNOWN_T, _DIRECTORY_T
+=======
+from satoricore.common import _STANDARD_EXT as SE
+
+st_mode_mapper = {
+    stat.S_IFBLK: SE.BLOCK_DEVICE_T,
+    stat.S_IFCHR: SE.CHAR_DEVICE_T,
+    stat.S_IFIFO: SE.FIFO_T,
+    stat.S_IFLNK: SE.LINK_T,
+    stat.S_IFSOCK: SE.SOCKET_T,
+}
+>>>>>>> f3a26401d2f7aacd209f35f4c17254b00bd61299
 
 
 class BaseCrawler:
