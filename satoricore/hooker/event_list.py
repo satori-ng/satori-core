@@ -33,3 +33,7 @@ class EventList():
             raise EventException("Invalid key provided. Valid options: %s" %
                                  ", ".join(self._events.keys()))
         event_list.hook(function, dependencies)
+
+    def __getitem__(self, name):
+        """Get the HookList"""
+        return self._events[name]

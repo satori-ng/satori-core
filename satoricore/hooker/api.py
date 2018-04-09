@@ -1,7 +1,6 @@
 from satoricore.hooker.event_list import EventList
 
 EVENTS = EventList()
-# events.append(["on_start", "pre_open", "with_open", "post_close", "on_end"])
 
 
 def hook(event, dependencies=None):

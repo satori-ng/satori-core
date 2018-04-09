@@ -3,15 +3,6 @@ import stat
 
 from exts.crawler import hook
 
-_DIRECTORY_T = 'D'
-_FILE_T = 'F'
-_LINK_T = 'L'
-_BLOCK_DEVICE_T = 'B'
-_CHAR_DEVICE_T = 'C'
-_FIFO_T = 'I'
-_SOCKET_T = 'S'
-_UNKNOWN_T = 'U'
-
 st_mode_mapper = {
     stat.S_IFBLK: _BLOCK_DEVICE_T,
     stat.S_IFCHR: _CHAR_DEVICE_T,
