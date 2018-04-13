@@ -10,11 +10,15 @@ from satoricore.crawler import BaseCrawler
 from satoricore.image import SatoriImage
 from satoricore.common import _STANDARD_EXT as SE
 
+from satoricore.hooker.defaults import *
 
 
 def _clone(args):
     crawler = BaseCrawler(args.entrypoints, args.excluded_dirs)
     image = SatoriImage()
+    if args.load_extensions:
+        os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
+
 
     for filename, filetype in crawler():
         image.add_file(filename)

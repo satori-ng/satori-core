@@ -4,9 +4,6 @@ import operator
 import functools
 import collections
 
-# import satoricore.hooker as hooker
-# <<<<<<< HEAD
-# =======
 from satoricore.common import _STANDARD_EXT as SE
 
 st_mode_mapper = {
@@ -16,7 +13,6 @@ st_mode_mapper = {
     stat.S_IFLNK: SE.LINK_T,
     stat.S_IFSOCK: SE.SOCKET_T,
 }
-# >>>>>>> f3a26401d2f7aacd209f35f4c17254b00bd61299
 
 
 class BaseCrawler:
