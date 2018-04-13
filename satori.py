@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
 import argparse
-from satoricore.crawler import BaseCrawler
-from satoricore.hooker import EVENTS
-from satoricore.image import SatoriImage
+import sys
 
+from satoricore.hooker import EVENTS
 EVENTS.append(["on_start", "pre_open", "with_open", "post_close", "on_end"])
+
+from satoricore.crawler import BaseCrawler
+from satoricore.image import SatoriImage
+from satoricore.common import _STANDARD_EXT as SE
+
 
 
 def _clone(args):
@@ -13,12 +17,21 @@ def _clone(args):
     image = SatoriImage()
 
     for filename, filetype in crawler():
-        image.add_file(filename, filetype)
+        image.add_file(filename)
         EVENTS["pre_open"](satori_image=image, file_path=filename, file_type=filetype)
-        fd = open(filename)
-        EVENTS["with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
-        fd.close()
-        EVENTS["post_close"](satori_image=image, file_path=filename, file_type=filetype)
+        if filetype is not SE.DIRECTORY_T:
+            try:
+                fd = open(filename)
+                EVENTS["with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
+                fd.close()
+                EVENTS["post_close"](satori_image=image, file_path=filename, file_type=filetype)
+            except Exception as e:
+                print("[-] %s . File '%s' could not be opened." % (e, filename), file=sys.stderr)
+                # print(
+                #     "[-] %s.  File '%s' could not be opened. " % (str(e), filename),
+                #     file=sys.stdout,
+                #     )
+
 
     image._test_print()
 

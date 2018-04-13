@@ -102,7 +102,7 @@ class SatoriImage(object):
                 # Directory doesn't exist - create it
                 cur_position[token] = {
                     _CONTENTS_S: {},
-                    _TYPE_S: _STANDARD_EXT._DIRECTORY_T,
+                    _TYPE_S: _STANDARD_EXT.DIRECTORY_T,
                 }
 
             cur_position = cur_position[token][_CONTENTS_S]
@@ -117,7 +117,7 @@ class SatoriImage(object):
         dir_dict = self.__get_file_dict(full_path)
         if _CONTENTS_S not in dir_dict.keys():
             raise FileNotFoundError("Does not exist: '{}'".format(full_path))
-        if dir_dict[_TYPE_S] != _STANDARD_EXT._DIRECTORY_T:
+        if dir_dict[_TYPE_S] != _STANDARD_EXT.DIRECTORY_T:
             raise NotADirectoryError("Not a directory: '{}'".format(full_path))
         return dir_dict[_CONTENTS_S].keys()
 

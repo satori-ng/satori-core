@@ -27,11 +27,18 @@ class EventList():
 
     def hook(self, event, function, dependencies=None):
         """Tries to load the hook to the event"""
-
         event_list = self._events.get(event, None)
+        print(event_list)
         if event_list is None:
-            raise EventException("Invalid key provided. Valid options: %s" %
-                                 ", ".join(self._events.keys()))
+            error_message = (
+                "Invalid key provided '%s'. Valid options: %s" % 
+                            (
+                            event,
+                           ", ".join(self._events.keys()),
+                            )
+                )
+            raise EventException(error_message)
+
         event_list.hook(function, dependencies)
 
     def __getitem__(self, name):

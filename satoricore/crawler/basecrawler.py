@@ -6,9 +6,8 @@ import collections
 
 # import satoricore.hooker as hooker
 # <<<<<<< HEAD
-from satoricore.hooker.defaults.stat_ext import _UNKNOWN_T, _DIRECTORY_T
 # =======
-# from satoricore.common import _STANDARD_EXT as SE
+from satoricore.common import _STANDARD_EXT as SE
 
 st_mode_mapper = {
     stat.S_IFBLK: SE.BLOCK_DEVICE_T,
@@ -86,7 +85,7 @@ class BaseCrawler:
     def __call__(self):
         for dirs, files in self._iter_entrypoints():
             for _dir in dirs:
-                yield (_dir, _DIRECTORY_T)
+                yield (_dir, SE.DIRECTORY_T)
 
             for _file in files:
-                yield (_file, _UNKNOWN_T)
+                yield (_file, SE.UNKNOWN_T)

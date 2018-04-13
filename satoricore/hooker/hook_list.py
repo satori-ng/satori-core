@@ -15,7 +15,7 @@ class HookList(list):
     later = []
 
     def __call__(self, *args, **kwargs):
-        if not self.later:
+        if self.later:
             raise HookException(
                 "Dependencies not met for: %s" %
                 ", ".join([x.__name__ + ":" + x.__module__
