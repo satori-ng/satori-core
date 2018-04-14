@@ -2,8 +2,6 @@ import os
 import os.path
 import platform
 
-from pprint import pprint
-
 import satoricore
 from satoricore.common import _STANDARD_EXT
 
@@ -57,6 +55,17 @@ class SatoriImage(object):
         #        platform.mac_ver()
         # except :
         #     pass
+
+    def _get_data_struct(self):
+        return self.__data
+
+    def _set_data_struct(self, data_struct):
+        self.__data = data_struct
+
+
+    def set_metadata(self, attr_dict, metadata_type, ):
+
+        pass
 
     def add_file(self, full_path):
         self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
@@ -132,6 +141,20 @@ class SatoriImage(object):
 
     def __repr__(self):
         return self.__data.__repr__()
+
+
+
+def write(fd, image, serializer=None):
+    if serializer is None:
+        import json
+        serializer = json
+        def json_dumps_compact(image, *args, **kwargs):
+            return serializer.dumps(image, indent=0, separators=(',',':'))
+        serializer.dumps = json_dumps_compact
+
+    serialized = serializer.dumps(image)
+    fd.write(serialized)
+
 
 
 if __name__ == '__main__':

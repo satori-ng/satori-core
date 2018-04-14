@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 import sys
 
 from satoricore.hooker import EVENTS
@@ -10,6 +11,7 @@ from satoricore.crawler import BaseCrawler
 from satoricore.image import SatoriImage
 from satoricore.common import _STANDARD_EXT as SE
 
+from satoricore.serialize.pickle import SatoriPickler
 
 
 def _clone(args):
@@ -32,8 +34,9 @@ def _clone(args):
                 #     file=sys.stdout,
                 #     )
 
-
-    image._test_print()
+    satori_pkl = SatoriPickler()
+    print(args.image_file, type(args.image_file))
+    satori_pkl.write(image, args.image_file)
 
 
 def _diff(args):
@@ -71,6 +74,13 @@ def _setup_argument_parser():
         help='Start iteration using these directories.',
         nargs='+',
     )
+
+    clone_parser.add_argument(
+        'image_file',
+        help='Store the created image in that file',
+        default="%s.str" % os.uname,
+    )
+
     clone_parser.set_defaults(func=_clone)
 
     diff_parser = subparsers.add_parser('diff')
