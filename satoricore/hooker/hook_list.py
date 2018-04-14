@@ -22,8 +22,8 @@ class HookList(list):
                            for x in self.later]))
 
         for func in self:
-            print('Calling %s from module %s with args: %s and kwargs: %s' %
-                  (func.__name__, func.__module__, args, kwargs))
+            # print('Calling %s from module %s with args: %s and kwargs: %s' %
+            #       (func.__name__, func.__module__, args, kwargs))
             # Skip extension if it doens't accept the arguments passed
             try:
                 inspect.signature(func).bind(*args, **kwargs)

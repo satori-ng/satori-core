@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class _STANDARD_EXT(Enum):
+class _STANDARD_EXT(object):
     DIRECTORY_T = 'D'
     FILE_T = 'F'
     LINK_T = 'L'

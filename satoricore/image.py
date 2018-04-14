@@ -77,8 +77,8 @@ class SatoriImage(object):
         and creates it if it doesn't exist.
         """
         file_dict = self.__get_file_dict(full_path, force_create=force_create)
-        if ext_name not in _STANDARD_EXT:
-            self.__data['metadata']['satori']['extensions'].append(ext_name)
+        # if ext_name not in _STANDARD_EXT:
+        #     self.__data['metadata']['satori']['extensions'].append(ext_name)
         file_dict[ext_name] = attr_dict
         return file_dict
 
@@ -131,10 +131,11 @@ class SatoriImage(object):
         return dir_dict[_CONTENTS_S].keys()
 
     def _test_print(self, key=None):
+        import json
         if key:
-            pprint(self.__data[key])
+            print(json.dumps(self.__data[key], indent=1))
         else:
-            pprint(self.__data)
+            print(json.dumps(self.__data, indent=1))
 
     def __str__(self):
         return self.__data.__str__()
