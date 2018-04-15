@@ -11,19 +11,19 @@ class SatoriJsoner(Serializer):
 
 	def dumps(self, data_struct):
 		if self.compress:
-			content_dump = bytes(
-				json.dumps(data_struct,
+			content_dump = json.dumps(
+					data_struct,
 					indent=0,
 					separators=(',',':'),
-					),
-				'utf8'
-				)
+					)
+				
 		else:
 			content_dump = json.dumps(data_struct)
 
-		# content_dump = bytes(json.dumps(data_struct), 'utf8')
-		return content_dump
+		# print(content_dump)
+		return bytes(content_dump, 'utf8')
 
 	def loads(self, content):
-		print (type(content))
+		# print (type(content))
+		# print(content)
 		return json.loads(content)

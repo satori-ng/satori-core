@@ -19,5 +19,7 @@ class test_EmptyImage(unittest.TestCase):
         si = SatoriImage()
 
         si.add_file("/etc/shadow")
+        # print(si)
         ret = si.get_dir_contents("/etc")
+        # print(ret)
         self.assertTrue('shadow' in ret)

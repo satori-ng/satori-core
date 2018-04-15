@@ -62,7 +62,6 @@ class SatoriImage(object):
     def _set_data_struct(self, data_struct):
         self.__data = data_struct
 
-
     def set_metadata(self, attr_dict, metadata_type, ):
 
         pass
@@ -93,10 +92,11 @@ class SatoriImage(object):
             full_path = full_path[:-1]
         # Get a list from the separated path
         path_tokens = full_path.split(os.sep)
-        # clear the list from empty strings
         # path_tokens = [token for token in path_tokens if token]
         cur_position = self.__data['data']['filesystem']
         for token in path_tokens[:-1]:
+            # Try accessing the file dict
+            # cur_position = cur_position[token]
             if not force_create:
                 continue
 
@@ -124,18 +124,13 @@ class SatoriImage(object):
 
     def get_dir_contents(self, full_path):
         dir_dict = self.__get_file_dict(full_path)
+        print(dir_dict.keys())
         if _CONTENTS_S not in dir_dict.keys():
             raise FileNotFoundError("Does not exist: '{}'".format(full_path))
         if dir_dict[_TYPE_S] != _STANDARD_EXT.DIRECTORY_T:
             raise NotADirectoryError("Not a directory: '{}'".format(full_path))
         return dir_dict[_CONTENTS_S].keys()
 
-    def _test_print(self, key=None):
-        import json
-        if key:
-            print(json.dumps(self.__data[key], indent=1))
-        else:
-            print(json.dumps(self.__data, indent=1))
 
     def __str__(self):
         return self.__data.__str__()
@@ -143,33 +138,6 @@ class SatoriImage(object):
     def __repr__(self):
         return self.__data.__repr__()
 
-
-
-def write(fd, image, serializer=None):
-    if serializer is None:
-        import json
-        serializer = json
-        def json_dumps_compact(image, *args, **kwargs):
-            return serializer.dumps(image, indent=0, separators=(',',':'))
-        serializer.dumps = json_dumps_compact
-
-    serialized = serializer.dumps(image)
-    fd.write(serialized)
-
-
-
-if __name__ == '__main__':
-    si = SatoriImage()
-
-    si.add_file('/')
-    # si.add_file('/etc')
-    si.add_file('/etc/passwd/')
-    si.add_file('/dev/random')
-    si.add_file('/etc/sudoers')
-    stat_obj = os.stat('/etc/sudoers')
-    si.set_attribute('/etc/sudoers', stat_obj, 'stat')
-    si.set_attribute('/etc/sudoers', stat_obj.st_size, _SIZE_S)
-    # print si.__data
-    si._test_print('data')
-
-    # print(si.get_dir_contents('/asas'))
+    def __eq__(self, rhs):
+        # return self.__data == rhs._get_data_struct
+        return repr(self) == repr(rhs)
