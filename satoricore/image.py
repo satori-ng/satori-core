@@ -28,33 +28,8 @@ class SatoriImage(object):
     def __init__(self):
         self.__data = {}
         self.__data['metadata'] = {}
-        self.__data['metadata']['satori'] = {}
-        self.__data['metadata']['system'] = {}
         self.__data['data'] = {}
         self.__data['data']['filesystem'] = {}
-        # self.__data['data']['commands'] = {}
-
-        self.__data['metadata']['satori']['version'] = satoricore.__version__
-        self.__data['metadata']['satori']['extensions'] = []
-
-        self.__data['metadata']['system']['type'] = platform.system()
-        self.__data['metadata']['system']['user'] = os.getlogin()
-        self.__data['metadata']['system']['platform'] = platform.platform()
-        self.__data['metadata']['system']['hostname'] = platform.node()
-        self.__data['metadata']['system']['machine'] = platform.machine()
-        self.__data['metadata']['system']['release'] = platform.release()
-        self.__data['metadata']['system']['processor'] = platform.processor()
-        self.__data['metadata']['system']['specifics'] = {}
-        # try :
-        #     self.__data['metadata']['system']['specifics']['win'] = \
-        #        platform.win32_ver()
-        # except :
-        #     pass
-        # try :
-        #     self.__data['metadata']['system']['specifics']['mac'] = \
-        #        platform.mac_ver()
-        # except :
-        #     pass
 
     def _get_data_struct(self):
         return self.__data
@@ -62,9 +37,8 @@ class SatoriImage(object):
     def _set_data_struct(self, data_struct):
         self.__data = data_struct
 
-    def set_metadata(self, attr_dict, metadata_type, ):
-
-        pass
+    def set_metadata(self, attr_dict, metadata_type):
+        self.__data['metadata'][metadata_type] = attr_dict
 
     def add_file(self, full_path):
         self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)

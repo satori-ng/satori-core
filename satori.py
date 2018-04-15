@@ -18,9 +18,8 @@ from satoricore.serialize.json import SatoriJsoner
 from satoricore.hooker.defaults import *
 
 
-def _clone(args):
+def _clone(args, image):
     crawler = BaseCrawler(args.entrypoints, args.excluded_dirs)
-    image = SatoriImage()
 
     for i, extension in enumerate(args.load_extensions):
         try:
@@ -32,8 +31,6 @@ def _clone(args):
         except Exception as e:
             print ("[-] [{}] - Extension {} could not be loaded".format(e, extension))
     # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
-
-
 
     for filename, filetype in crawler():
         image.add_file(filename)
@@ -58,7 +55,7 @@ def _clone(args):
     image_serializer.write(image, args.image_file)
     print("[+] Stored to file '{}'".format(image_serializer.last_file))
 
-def _diff(args):
+def _diff(args, image):
     raise NotImplementedError
 
 
@@ -118,7 +115,8 @@ def _setup_argument_parser():
 if __name__ == '__main__':
     parser = _setup_argument_parser()
     args = parser.parse_args()
+    image = SatoriImage()
     if 'func' in args:
-        EVENTS["on_start"](parser=parser, args=args)
-        args.func(args)
+        EVENTS["on_start"](parser=parser, args=args, satori_image=image)
+        args.func(args, image)
         EVENTS["on_end"]()
