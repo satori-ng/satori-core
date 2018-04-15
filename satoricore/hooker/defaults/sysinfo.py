@@ -12,9 +12,9 @@ def sysinfo(parser, args, satori_image):
     satori_meta = {}
     system_meta = {}
 
-    satori_meta['satori'] = {}
-    satori_meta['satori']['version'] = satoricore.__version__
-    satori_meta['satori']['extensions'] = []
+    satori_meta = {}
+    satori_meta['version'] = satoricore.__version__
+    satori_meta['extensions'] = []
 
     system_meta['type'] = platform.system()
     system_meta['user'] = os.getlogin()
@@ -24,7 +24,6 @@ def sysinfo(parser, args, satori_image):
     system_meta['release'] = platform.release()
     system_meta['processor'] = platform.processor()
     system_meta['specifics'] = {}
-
 
     satori_image.set_metadata(system_meta,'system')
     satori_image.set_metadata(satori_meta,'satori')

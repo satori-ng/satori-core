@@ -43,7 +43,7 @@ image_serializers = [
 						satori_pkl,
 						satori_jsn,
 						satori_pkl_uncompress,
-						satori_jsn_uncompress
+						satori_jsn_uncompress,
 					]
 
 for serializer in image_serializers:
