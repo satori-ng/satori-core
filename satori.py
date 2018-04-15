@@ -31,7 +31,7 @@ def _clone(args):
             print("Extension '{}' loaded".format(ext_module.__name__))
         except Exception as e:
             print ("[-] [{}] - Extension {} could not be loaded".format(e, extension))
-        # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
+    # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
 
 
 
@@ -86,6 +86,7 @@ def _setup_argument_parser():
         '-l', '--load-extensions',
         help='Load the following extensions',
         action='append',
+        default=[],
     )
 
     clone_parser.add_argument(

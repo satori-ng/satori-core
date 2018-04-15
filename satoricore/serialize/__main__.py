@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 
 from satoricore.serialize.pickle import SatoriPickler
 from satoricore.serialize.json import SatoriJsoner
@@ -11,9 +12,8 @@ def display_image(image):
 		json.dumps(data_struct,
 					indent=1,
 					separators=(',',':')
-					)
+					),
 		)
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('filename', 
@@ -56,11 +56,15 @@ for serializer in image_serializers:
 			.format(
 				compress="compressed" if serializer.compress else "",
 				type=serializer._type
-				)
+				),
+				file=sys.stderr,
 			)
 		break
 	except Exception as e:
-		print("[!] {}".format(e))
+		print(
+			"[!] {}".format(e),
+			file=sys.stderr,
+			)
 
 
 
