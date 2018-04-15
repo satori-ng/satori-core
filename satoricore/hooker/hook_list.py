@@ -29,6 +29,7 @@ class HookList(list):
                 inspect.signature(func).bind(*args, **kwargs)
             except TypeError:
                 # TODO: Add logging for skipped extensions
+                print("Skipping {} ".format(func))
                 continue
             func(*args, **kwargs)
 

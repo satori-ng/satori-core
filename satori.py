@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import imp
 import os
 import sys
 
@@ -20,26 +21,37 @@ from satoricore.hooker.defaults import *
 def _clone(args):
     crawler = BaseCrawler(args.entrypoints, args.excluded_dirs)
     image = SatoriImage()
-    if args.load_extensions:
-        os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
+
+    for i, extension in enumerate(args.load_extensions):
+        try:
+            ext_module = imp.load_source(
+                'extension_{}'.format(i),
+                extension
+                )
+            print("Extension '{}' loaded".format(ext_module.__name__))
+        except Exception as e:
+            print ("[-] [{}] - Extension {} could not be loaded".format(e, extension))
+        # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
+
 
 
     for filename, filetype in crawler():
         image.add_file(filename)
         EVENTS["pre_open"](satori_image=image, file_path=filename, file_type=filetype)
         if filetype is not SE.DIRECTORY_T:
-            try:
-                fd = open(filename)
-                EVENTS["with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
-                fd.close()
-                EVENTS["post_close"](satori_image=image, file_path=filename, file_type=filetype)
-            except Exception as e:
-                if not args.quiet:
-                    print("[-] %s . File '%s' could not be opened." % (e, filename), file=sys.stderr)
-                # print(
-                #     "[-] %s.  File '%s' could not be opened. " % (str(e), filename),
-                #     file=sys.stdout,
-                #     )
+            if len(EVENTS["with_open"]):
+                try:
+                    fd = open(filename, 'rb')
+                    EVENTS["with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
+                    fd.close()
+                    EVENTS["post_close"](satori_image=image, file_path=filename, file_type=filetype)
+                except Exception as e:
+                    if not args.quiet:
+                        print("[-] %s . File '%s' could not be opened." % (e, filename), file=sys.stderr)
+                    # print(
+                    #     "[-] %s.  File '%s' could not be opened. " % (str(e), filename),
+                    #     file=sys.stdout,
+                    #     )
 
     # image_serializer = SatoriPickler(compress=False)
     image_serializer = SatoriJsoner()
