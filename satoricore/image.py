@@ -68,6 +68,7 @@ class SatoriImage(object):
 
     def add_file(self, full_path):
         self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
+        self.set_attribute(full_path, _STANDARD_EXT.UNKNOWN_T, _TYPE_S, force_create=False)
 
     def set_attribute(self, full_path, attr_dict,
                       ext_name, force_create=False):
@@ -95,10 +96,6 @@ class SatoriImage(object):
         # path_tokens = [token for token in path_tokens if token]
         cur_position = self.__data['data']['filesystem']
         for token in path_tokens[:-1]:
-            # Try accessing the file dict
-            # cur_position = cur_position[token]
-            if not force_create:
-                continue
 
             try:
                 # Try Accessing directory contents
@@ -109,10 +106,13 @@ class SatoriImage(object):
                 # cur_position[token][_CONTENTS_S]
             except KeyError:
                 # Directory doesn't exist - create it
-                cur_position[token] = {
-                    _CONTENTS_S: {},
-                    _TYPE_S: _STANDARD_EXT.DIRECTORY_T,
-                }
+                if force_create:
+                    cur_position[token] = {
+                        _CONTENTS_S: {},
+                        _TYPE_S: _STANDARD_EXT.DIRECTORY_T,
+                    }
+                else:
+                    raise FileNotFoundError("Does not exist: '{}'".format(full_path))
 
             cur_position = cur_position[token][_CONTENTS_S]
 
@@ -124,7 +124,7 @@ class SatoriImage(object):
 
     def get_dir_contents(self, full_path):
         dir_dict = self.__get_file_dict(full_path)
-        print(dir_dict.keys())
+        # print(dir_dict.keys())
         if _CONTENTS_S not in dir_dict.keys():
             raise FileNotFoundError("Does not exist: '{}'".format(full_path))
         if dir_dict[_TYPE_S] != _STANDARD_EXT.DIRECTORY_T:

@@ -1,4 +1,3 @@
-import base64
 import os
 import unittest
 
@@ -38,17 +37,13 @@ class test_Serializers(unittest.TestCase):
     def test_create_image(self):
         for serializer in self.serializers:
             image = serializer.read('test', suffixed=False)
-            s1 = repr(image)
-            s2 = repr(self.image)
-            # self.assertTrue(s1 == s2)
-            print("[+] %s" % serializer.last_file)
             self.assertTrue(image == self.image)
 
 
     def tearDown(self):
         for filename in os.listdir('.'):
-            # os.unlink(filename)
-            print("Cleaning '%s'" % filename)
+            os.unlink(filename)
+            # print("Cleaning '%s'" % filename)
             pass
         os.chdir("..")
         os.rmdir('gen_images')
