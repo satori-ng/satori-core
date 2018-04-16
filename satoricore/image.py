@@ -1,8 +1,6 @@
 import os
 import os.path
-import platform
 
-import satoricore
 from satoricore.common import _STANDARD_EXT
 
 # Those tags will end up in the __data dict several times
