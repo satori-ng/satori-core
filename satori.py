@@ -2,8 +2,10 @@
 
 import argparse
 import imp
+import itertools
 import os
 import sys
+from multiprocessing.dummy import Pool as ThreadPool 
 
 from hooker import EVENTS
 EVENTS.append(["on_start", "pre_open", "with_open", "post_close", "on_end"])
@@ -17,10 +19,33 @@ from satoricore.serialize.json import SatoriJsoner
 
 from satoricore.extensions import *
 
+THREAD_NUMBER = 4
+
+
+def file_worker(image, file_desc):
+
+    filename, filetype = file_desc
+    image.add_file(filename)
+    EVENTS["pre_open"](satori_image=image, file_path=filename, file_type=filetype)
+    if filetype is not SE.DIRECTORY_T:
+        if len(EVENTS["with_open"]):
+            try:
+                fd = open(filename, 'rb')
+                EVENTS["with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
+                fd.close()
+                EVENTS["post_close"](satori_image=image, file_path=filename, file_type=filetype)
+            except Exception as e:
+                if not args.quiet:
+                    print("[-] %s . File '%s' could not be opened." % (e, filename), file=sys.stderr)
+                # print(
+                #     "[-] %s.  File '%s' could not be opened. " % (str(e), filename),
+                #     file=sys.stdout,
+                #     )
+
 
 def _clone(args, image):
     crawler = BaseCrawler(args.entrypoints, args.excluded_dirs)
-
+    # dispatcher(image, file_queue)
     for i, extension in enumerate(args.load_extensions):
         try:
             ext_module = imp.load_source(
@@ -31,24 +56,15 @@ def _clone(args, image):
         except Exception as e:
             print ("[-] [{}] - Extension {} could not be loaded".format(e, extension))
     # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
-
-    for filename, filetype in crawler():
-        image.add_file(filename)
-        EVENTS["pre_open"](satori_image=image, file_path=filename, file_type=filetype)
-        if filetype is not SE.DIRECTORY_T:
-            if len(EVENTS["with_open"]):
-                try:
-                    fd = open(filename, 'rb')
-                    EVENTS["with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
-                    fd.close()
-                    EVENTS["post_close"](satori_image=image, file_path=filename, file_type=filetype)
-                except Exception as e:
-                    if not args.quiet:
-                        print("[-] %s . File '%s' could not be opened." % (e, filename), file=sys.stderr)
-                    # print(
-                    #     "[-] %s.  File '%s' could not be opened. " % (str(e), filename),
-                    #     file=sys.stdout,
-                    #     )
+    pool = ThreadPool(args.threads) 
+    pool.starmap(file_worker,       # image, filename, filetype
+                zip(
+                    itertools.repeat(image),
+                    crawler(),
+                )
+            )
+    pool.close()
+    pool.join()
 
     # image_serializer = SatoriPickler(compress=False)
     image_serializer = SatoriJsoner()
@@ -91,6 +107,13 @@ def _setup_argument_parser():
         help=("Does not show Errors"),
         default=False,
         action='store_true',
+    )
+
+    clone_parser.add_argument(
+        '-t', '--threads',
+        help=("Number of threads to use"),
+        default=4,
+        type=int,
     )
 
     clone_parser.add_argument(

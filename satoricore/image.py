@@ -1,5 +1,6 @@
 import os
 import os.path
+import threading
 
 from satoricore.common import _STANDARD_EXT
 
@@ -39,10 +40,14 @@ class SatoriImage(object):
         self.__data['metadata'][metadata_type] = attr_dict
 
     def add_file(self, full_path):
-        self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
-        self.set_attribute(
-            full_path, _STANDARD_EXT.UNKNOWN_T, _TYPE_S, force_create=False
-        )
+        with threading.Lock():
+            self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
+            self.set_attribute(
+                full_path,
+                _STANDARD_EXT.UNKNOWN_T,
+                _TYPE_S,
+                force_create=False,
+            )
 
     def set_attribute(self, full_path, attr_dict,
                       ext_name, force_create=False):
