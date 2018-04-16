@@ -5,7 +5,7 @@ import imp
 import os
 import sys
 
-from satoricore.hooker import EVENTS
+from hooker import EVENTS
 EVENTS.append(["on_start", "pre_open", "with_open", "post_close", "on_end"])
 
 from satoricore.crawler import BaseCrawler
@@ -15,7 +15,7 @@ from satoricore.common import _STANDARD_EXT as SE
 from satoricore.serialize.pickle import SatoriPickler
 from satoricore.serialize.json import SatoriJsoner
 
-from satoricore.hooker.defaults import *
+from satoricore.extensions import *
 
 
 def _clone(args, image):
