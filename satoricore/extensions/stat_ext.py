@@ -1,7 +1,6 @@
 import os
 import stat
-
-from satoricore.hooker import hook
+from hooker import hook
 
 _DIRECTORY_T = 'D'
 _FILE_T = 'F'
