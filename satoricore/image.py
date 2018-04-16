@@ -11,7 +11,7 @@ from satoricore.common import _STANDARD_EXT
 # Here they can be globally minified
 _TYPE_S = 'type'
 _CONTENTS_S = 'contents'
-_SIZE_S = 'filesize'
+_SIZE_S = 'size'
 
 
 class FileNotFoundError(Exception):
@@ -70,7 +70,6 @@ class SatoriImage(object):
         # path_tokens = [token for token in path_tokens if token]
         cur_position = self.__data['data']['filesystem']
         for token in path_tokens[:-1]:
-
             try:
                 # Try Accessing directory contents
                 if _CONTENTS_S not in cur_position[token].keys():
@@ -105,6 +104,8 @@ class SatoriImage(object):
             raise NotADirectoryError("Not a directory: '{}'".format(full_path))
         return dir_dict[_CONTENTS_S].keys()
 
+    def listdir(self, full_path):
+        return self.get_dir_contents(full_path)
 
     def __str__(self):
         return self.__data.__str__()

@@ -54,8 +54,8 @@ for serializer in image_serializers:
 
 		print("[+] File is a {compress} {type} SatoriImage"
 			.format(
-				compress="compressed" if serializer.compress else "",
-				type=serializer._type
+					compress="compressed" if serializer.compress else "",
+					type=serializer._type
 				),
 				file=sys.stderr,
 			)
@@ -65,8 +65,3 @@ for serializer in image_serializers:
 			"[!] {}".format(e),
 			file=sys.stderr,
 			)
-
-
-
-
-

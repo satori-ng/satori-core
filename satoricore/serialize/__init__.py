@@ -36,3 +36,31 @@ class Serializer(object):
 		image._set_data_struct(data_struct)
 		self.last_file = filename
 		return image
+
+
+def load_image(filename):
+	from satoricore.serialize.pickle import SatoriPickler
+	from satoricore.serialize.json import SatoriJsoner
+
+	satori_pkl = SatoriPickler()
+	satori_jsn = SatoriJsoner()
+	satori_pkl_uncompress = SatoriPickler(compress=False)
+	satori_jsn_uncompress = SatoriJsoner(compress=False)
+
+	image_serializers = [
+							satori_pkl,
+							satori_jsn,
+							satori_pkl_uncompress,
+							satori_jsn_uncompress,
+						]
+
+	for serializer in image_serializers:
+		try:
+			image = serializer.read(filename)
+			# print (filename)
+			return image
+		except Exception as e:
+			# print("[-] {}".format(e))
+			pass
+
+	return None
