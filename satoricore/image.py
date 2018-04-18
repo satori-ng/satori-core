@@ -68,17 +68,17 @@ class SatoriImage(object):
         file_dict[ext_name] = attr_dict
         return file_dict
 
-    def __get_file_dict(self, full_path, force_create=False):
+    def __get_file_dict(self, full_path, force_create=False, sep=os.path.sep):
         """
         Returns the 'dict' object for the 'full_path' specified.
         If 'force_create' is enabled and the 'full_path' does not exist,
         a dict is automatically created for that path
         """
         # Eliminate trailing '/' to make splitting easier
-        if full_path.endswith(os.sep):
+        if full_path.endswith(sep):
             full_path = full_path[:-1]
         # Get a list from the separated path
-        path_tokens = full_path.split(os.sep)
+        path_tokens = full_path.split(sep)
         # path_tokens = [token for token in path_tokens if token]
         cur_position = self.__data['data']['filesystem']
         for token in path_tokens[:-1]:
