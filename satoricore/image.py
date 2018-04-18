@@ -1,6 +1,7 @@
 import os
 import os.path
 import threading
+import pathlib
 
 from satoricore.common import _STANDARD_EXT
 
@@ -11,6 +12,9 @@ from satoricore.common import _STANDARD_EXT
 _TYPE_S = 'type'
 _CONTENTS_S = 'contents'
 _SIZE_S = 'size'
+
+posixsep = pathlib.posixpath.sep
+ntsep = pathlib.ntpath.sep
 
 
 class FileNotFoundError(Exception):
