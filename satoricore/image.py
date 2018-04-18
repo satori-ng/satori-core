@@ -49,6 +49,13 @@ class SatoriImage(object):
                 force_create=False,
             )
 
+    def get_attribute(self, full_path, attr):
+        return self.__get_file_dict(full_path).get(attr, {})
+        # try:
+            # return self.__get_file_dict(full_path)[attr]
+        # except KeyError:
+            # return {}
+
     def set_attribute(self, full_path, attr_dict,
                       ext_name, force_create=False):
         """
@@ -100,6 +107,7 @@ class SatoriImage(object):
         file_token = path_tokens[-1]
         if file_token not in cur_position.keys():
             cur_position[file_token] = {}
+
         return cur_position[file_token]
 
     def get_dir_contents(self, full_path):

@@ -5,7 +5,7 @@ from hooker import hook
 import satoricore
 
 __name__ = 'sysinfo'
-# print ("hello")
+
 
 @hook("on_start")
 def sysinfo(parser, args, satori_image):
@@ -17,7 +17,6 @@ def sysinfo(parser, args, satori_image):
     satori_meta['extensions'] = []
 
     system_meta['type'] = platform.system()
-    system_meta['user'] = os.getlogin()
     system_meta['platform'] = platform.platform()
     system_meta['hostname'] = platform.node()
     system_meta['machine'] = platform.machine()
@@ -25,8 +24,15 @@ def sysinfo(parser, args, satori_image):
     system_meta['processor'] = platform.processor()
     system_meta['specifics'] = {}
 
-    satori_image.set_metadata(system_meta,'system')
-    satori_image.set_metadata(satori_meta,'satori')
+    satori_image.set_metadata(system_meta, 'system')
+    satori_image.set_metadata(satori_meta, 'satori')
+
+    try:
+        # Why you "FileNotFoundError" dude?
+        system_meta['user'] = os.getlogin()
+    except:
+        pass
+
     # try :
     #     system_meta['specifics']['win'] = \
     #        platform.win32_ver()
