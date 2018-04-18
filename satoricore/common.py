@@ -1,6 +1,3 @@
-from enum import Enum
-
-
 class _STANDARD_EXT(object):
     DIRECTORY_T = 'D'
     FILE_T = 'F'
