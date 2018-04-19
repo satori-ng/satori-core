@@ -22,18 +22,15 @@ def get_stat_info(satori_image, file_path, file_type):
         mode = stat.S_IFMT(file_stat.st_mode)
         file_type = ST_MODE_MAPPER.get(mode, _STANDARD_EXT.UNKNOWN_T)
 
-    stat_dict = {
-        'privileges': file_stat.st_mode,
-        'uid': file_stat.st_uid,
-        'gid': file_stat.st_gid,
-        'size': file_stat.st_size,
-    }
-
     times_dict = {
         'atime': file_stat.st_atime,
         'mtime': file_stat.st_mtime,
         'ctime': file_stat.st_ctime,
     }
+
+    # Translates lstat's attributes to a dict
+    # times_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat) if x.startswith("st_") and "time" in x}
+    stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat) if x.startswith("st_") and "time" not in x}
 
     satori_image.set_attribute(file_path, file_type, 'type', force_create=True)
     satori_image.set_attribute(file_path, stat_dict, 'stat', force_create=False)

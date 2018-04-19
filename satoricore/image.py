@@ -17,14 +17,6 @@ posixsep = pathlib.posixpath.sep
 ntsep = pathlib.ntpath.sep
 
 
-class FileNotFoundError(Exception):
-    pass
-
-
-class NotADirectoryError(Exception):
-    pass
-
-
 class SatoriImage(object):
 
     # listdir = get_dir_contents
@@ -55,10 +47,6 @@ class SatoriImage(object):
 
     def get_attribute(self, full_path, attr):
         return self.__get_file_dict(full_path).get(attr, {})
-        # try:
-            # return self.__get_file_dict(full_path)[attr]
-        # except KeyError:
-            # return {}
 
     def set_attribute(self, full_path, attr_dict,
                       ext_name, force_create=False):
@@ -109,14 +97,17 @@ class SatoriImage(object):
 
         # Create a file as an empty dict
         file_token = path_tokens[-1]
-        if file_token not in cur_position.keys():
+        if file_token not in cur_position.keys() and force_create:
             cur_position[file_token] = {}
 
-        return cur_position[file_token]
+        try:
+            return cur_position[file_token]
+        except KeyError:
+            raise FileNotFoundError("Does not exist: '{}'".format(full_path))
 
     def get_dir_contents(self, full_path):
         dir_dict = self.__get_file_dict(full_path)
-        # print(dir_dict.keys())
+
         if _CONTENTS_S not in dir_dict.keys():
             raise FileNotFoundError("Does not exist: '{}'".format(full_path))
         if dir_dict[_TYPE_S] != _STANDARD_EXT.DIRECTORY_T:
