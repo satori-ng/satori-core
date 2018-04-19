@@ -21,6 +21,9 @@ def get_stat_info(satori_image, file_path, file_type):
     if file_type != _STANDARD_EXT.DIRECTORY_T:
         mode = stat.S_IFMT(file_stat.st_mode)
         file_type = ST_MODE_MAPPER.get(mode, _STANDARD_EXT.UNKNOWN_T)
+    if file_type == _STANDARD_EXT.LINK_T:
+        satori_image.set_attribute(file_path, os.readlink(file_path),
+                                   'link', force_create=True)
 
     times_dict = {
         'atime': file_stat.st_atime,
@@ -29,9 +32,11 @@ def get_stat_info(satori_image, file_path, file_type):
     }
 
     # Translates lstat's attributes to a dict
-    # times_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat) if x.startswith("st_") and "time" in x}
-    stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat) if x.startswith("st_") and "time" not in x}
+    # times_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat)
+    #               if x.startswith("st_") and "time" in x}
+    stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat)
+                 if x.startswith("st_") and "time" not in x}
 
     satori_image.set_attribute(file_path, file_type, 'type', force_create=True)
-    satori_image.set_attribute(file_path, stat_dict, 'stat', force_create=False)
-    satori_image.set_attribute(file_path, times_dict, 'times', force_create=False)
+    satori_image.set_attribute(file_path, stat_dict, 'stat')
+    satori_image.set_attribute(file_path, times_dict, 'times')
