@@ -135,3 +135,33 @@ class SatoriImage(object):
     def __eq__(self, rhs):
         # return self.__data == rhs._get_data_struct
         return repr(self) == repr(rhs)
+
+    def _walk(self, entrypoint, sep):
+        entrypoints = [entrypoint]
+
+        def is_dir(x):
+            return x['type'] == _STANDARD_EXT.DIRECTORY_T
+
+        while True:
+            _entrypoint = entrypoints.pop(0)
+            _dict_ptr = self.__get_file_dict(_entrypoint, sep=sep)
+
+            keys = set(_dict_ptr['contents'].keys())
+            _dirs = {key for key in keys if is_dir(_dict_ptr['contents'][key])}
+            _files = keys - _dirs
+
+            yield _entrypoint, _dirs, _files
+
+            print(entrypoints)
+            entrypoints.extend(
+                [sep.join([_entrypoint, _dir]) for _dir in _dirs]
+            )
+            print(entrypoints)
+            if not entrypoints:
+                break
+
+    def walk(self, entrypoint):
+        os_type = self.__data['metadata']['system']['type']
+        sep = ntsep if os_type == 'Windows' else posixsep
+
+        return self._walk(entrypoint, sep)
