@@ -37,8 +37,8 @@ class SatoriImage(object):
         self.__data['metadata'][metadata_type] = attr_dict
 
     def add_file(self, full_path):
-        # with threading.Lock():
-        self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
+        with threading.Lock():
+            self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
 
     def get_attribute(self, full_path, attr):
         return self.__get_file_dict(full_path).get(attr, {})
@@ -55,7 +55,9 @@ class SatoriImage(object):
         file_dict[ext_name] = attr_dict
         return file_dict
 
-    def set_multiple_attributes(self, full_path, *attr_tuples, force_create=False):
+    def set_multiple_attributes(self, full_path,
+                                *attr_tuples,
+                                force_create=False):
         """
         Adds multiple attributes to a file specified in the 'full_path'
         and creates it if it doesn't exist.

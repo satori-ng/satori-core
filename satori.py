@@ -22,8 +22,12 @@ from satoricore.serialize.json import SatoriJsoner
 from satoricore.extensions import *
 
 
-def file_worker(image, file_desc):
+PROCESSED_FILES = 0
 
+
+def file_worker(image, file_desc):
+    global PROCESSED_FILES
+    PROCESSED_FILES += 1
     filename, filetype = file_desc
     image.add_file(filename)
     EVENTS["pre_open"](satori_image=image, file_path=filename, file_type=filetype)
@@ -77,6 +81,7 @@ def _clone(args, image):
     pool.close()
     pool.join()
 
+    print ("[*] Processed {} files".format(PROCESSED_FILES))
     print("[+] Image Generated!")
     # image_serializer = SatoriPickler(compress=False)
     image_serializer = SatoriJsoner()
