@@ -37,7 +37,6 @@ def get_stat_info(satori_image, file_path, file_type):
     stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat)
                  if x.startswith("st_") and "time" not in x}
 
-<<<<<<< HEAD
     satori_image.set_multiple_attributes(
                 file_path,
                     ('stat', stat_dict),
