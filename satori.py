@@ -4,6 +4,7 @@ import argparse
 import imp
 import itertools
 import os
+import os.path
 import sys
 from multiprocessing.dummy import Pool
 # from multiprocessing import Pool
@@ -44,7 +45,17 @@ def file_worker(image, file_desc):
 
 
 def _clone(args, image):
-    crawler = BaseCrawler(args.entrypoints, args.excluded_dirs)
+    entrypoints = []
+    for entrypoint in args.entrypoints:
+        if os.path.isdir(entrypoint):
+            entrypoints.append(entrypoint)
+        else:
+            print ("[-] Entrypoint '{}' is not a Directory".format(entrypoint))
+    if not entrypoints:
+        print ("[!] No valid Entrypoints Found!")
+        print ("[!] Exiting...")
+        sys.exit(-1)
+    crawler = BaseCrawler(entrypoints, args.excluded_dirs)
     # dispatcher(image, file_queue)
     for i, extension in enumerate(args.load_extensions):
         try:
