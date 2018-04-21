@@ -5,7 +5,8 @@ import imp
 import itertools
 import os
 import sys
-from multiprocessing.dummy import Pool as ThreadPool 
+from multiprocessing.dummy import Pool
+# from multiprocessing import Pool
 
 from hooker import EVENTS
 EVENTS.append(["on_start", "pre_open", "with_open", "post_close", "on_end"])
@@ -19,8 +20,6 @@ from satoricore.serialize.json import SatoriJsoner
 
 from satoricore.extensions import *
 
-THREAD_NUMBER = 4
-
 
 def file_worker(image, file_desc):
 
@@ -28,6 +27,7 @@ def file_worker(image, file_desc):
     image.add_file(filename)
     EVENTS["pre_open"](satori_image=image, file_path=filename, file_type=filetype)
     if filetype is not SE.DIRECTORY_T:
+        # print (image)
         if len(EVENTS["with_open"]):
             try:
                 fd = open(filename, 'rb')
@@ -56,7 +56,7 @@ def _clone(args, image):
         except Exception as e:
             print ("[-] [{}] - Extension {} could not be loaded".format(e, extension))
     # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
-    pool = ThreadPool(args.threads) 
+    pool = Pool(args.threads) 
     pool.starmap(file_worker,       # image, filename, filetype
                 zip(
                     itertools.repeat(image),
@@ -66,6 +66,7 @@ def _clone(args, image):
     pool.close()
     pool.join()
 
+    print("[+] Image Generated!")
     # image_serializer = SatoriPickler(compress=False)
     image_serializer = SatoriJsoner()
     image_serializer.write(image, args.image_file)

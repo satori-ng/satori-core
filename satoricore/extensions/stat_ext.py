@@ -32,6 +32,10 @@ def get_stat_info(satori_image, file_path, file_type):
     # times_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat) if x.startswith("st_") and "time" in x}
     stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat) if x.startswith("st_") and "time" not in x}
 
-    satori_image.set_attribute(file_path, file_type, 'type', force_create=True)
-    satori_image.set_attribute(file_path, stat_dict, 'stat', force_create=False)
-    satori_image.set_attribute(file_path, times_dict, 'times', force_create=False)
+    satori_image.set_multiple_attributes(
+                file_path,
+                    ('stat', stat_dict),
+                    ('times', times_dict),
+                    ('type', file_type),
+                force_create=False,
+                )

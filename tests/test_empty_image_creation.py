@@ -1,6 +1,6 @@
 import unittest
 
-from satoricore.image import SatoriImage, FileNotFoundError, NotADirectoryError
+from satoricore.image import SatoriImage
 
 
 class test_EmptyImage(unittest.TestCase):
@@ -48,3 +48,24 @@ class test_EmptyImage(unittest.TestCase):
             con = si.get_dir_contents('/etc/shadow')
         except NotADirectoryError:
             self.assertTrue(True)
+
+    def test_creating_directories(self):
+
+        si = SatoriImage()
+        si.add_file('/etc/sshd/')   # trailing '/' creates dir
+        self.assertTrue(si.is_dir('/etc/sshd'))
+        # si.listdir('/etc/sshd')
+
+
+    def test_setting_mult_attrs(self):
+        si = SatoriImage()
+
+        si.set_multiple_attributes('/tmp/test',
+            ('ext1', 'value1'),
+            ('ext2', 'value2'),
+            ('ext3', 'value3'),
+
+            force_create=True
+            )
+
+        self.assertTrue(si.get_attribute('/tmp/test', 'ext2') == 'value2')

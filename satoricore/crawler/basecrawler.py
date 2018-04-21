@@ -31,7 +31,7 @@ class BaseCrawler:
             # Do stuff
     """
 
-    def __init__(self, entrypoints, excluded_dirs):
+    def __init__(self, entrypoints, excluded_dirs, image=os):
 
         if not isinstance(entrypoints, collections.Iterable):
             entrypoints = [entrypoints]
@@ -47,9 +47,10 @@ class BaseCrawler:
         if excluded_dirs is None:
             excluded_dirs = set()
 
+        self.image = image
         self.entrypoints = entrypoints
         self.excluded_dirs = [
-            d.rstrip(os.path.sep)
+            d.rstrip(self.image.path.sep)
             for d in excluded_dirs
         ]
 
@@ -58,8 +59,8 @@ class BaseCrawler:
             # Iterate over the list from top top bottom so that we may edit the
             # list of directories to be traversed according to the list of
             # excluded dirs.
-            for _root, _dirs, _files in os.walk(entrypoint, topdown=True):
-                root = os.path.abspath(_root)
+            for _root, _dirs, _files in self.image.walk(entrypoint, topdown=True):
+                root = self.image.path.abspath(_root)
                 # TODO: This is most probably not needed. Remove after further
                 # testing.
                 if root in self.excluded_dirs:
