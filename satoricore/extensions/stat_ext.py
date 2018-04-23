@@ -1,4 +1,5 @@
 import os
+import os.path
 import stat
 from hooker import hook
 from satoricore.common import _STANDARD_EXT
@@ -9,7 +10,6 @@ ST_MODE_MAPPER = {
     stat.S_IFIFO: _STANDARD_EXT.FIFO_T,
     stat.S_IFLNK: _STANDARD_EXT.LINK_T,
     stat.S_IFSOCK: _STANDARD_EXT.SOCKET_T,
-    stat.S_IFLNK: _STANDARD_EXT.LINK_T,
     stat.S_IFREG: _STANDARD_EXT.FILE_T,
 }
 
@@ -22,8 +22,10 @@ def get_stat_info(satori_image, file_path, file_type):
         mode = stat.S_IFMT(file_stat.st_mode)
         file_type = ST_MODE_MAPPER.get(mode, _STANDARD_EXT.UNKNOWN_T)
     if file_type == _STANDARD_EXT.LINK_T:
-        satori_image.set_attribute(file_path, os.readlink(file_path),
-                                   'link', force_create=True)
+        points_to = os.path.realpath(file_path)
+        print(points_to)
+        satori_image.set_attribute(file_path, points_to,
+                                   'link', force_create=False)
 
     times_dict = {
         'atime': file_stat.st_atime,
