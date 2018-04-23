@@ -174,13 +174,13 @@ class SatoriImage(object):
         while True:
             _entrypoint = entrypoints.pop(0)
             _dict_ptr = self.__get_file_dict(_entrypoint, sep=sep)
-            if 'contents' not in _dict_ptr:
-                import pdb; pdb.set_trace()
             keys = set(_dict_ptr['contents'].keys())
             _dirs = {key for key in keys if is_dir(_dict_ptr['contents'][key])}
             _files = keys - _dirs
+            _dirs = list(_dirs)
+            _files = list(_files)
 
-            yield _entrypoint, list(_dirs), list(_files)
+            yield _entrypoint, _dirs, _files
 
             # print(entrypoints)
             entrypoints.extend(
