@@ -1,18 +1,9 @@
 import os
-import stat
 import operator
 import functools
 import collections
 
 from satoricore.common import _STANDARD_EXT as SE
-
-st_mode_mapper = {
-    stat.S_IFBLK: SE.BLOCK_DEVICE_T,
-    stat.S_IFCHR: SE.CHAR_DEVICE_T,
-    stat.S_IFIFO: SE.FIFO_T,
-    stat.S_IFLNK: SE.LINK_T,
-    stat.S_IFSOCK: SE.SOCKET_T,
-}
 
 
 class BaseCrawler:
