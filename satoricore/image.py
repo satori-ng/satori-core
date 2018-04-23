@@ -182,11 +182,11 @@ class SatoriImage(object):
 
             yield _entrypoint, list(_dirs), list(_files)
 
-            print(entrypoints)
+            # print(entrypoints)
             entrypoints.extend(
                 [sep.join([_entrypoint, _dir]) for _dir in _dirs]
             )
-            print(entrypoints)
+            # print(entrypoints)
             if not entrypoints:
                 break
 
