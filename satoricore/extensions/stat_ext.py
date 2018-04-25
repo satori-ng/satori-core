@@ -14,6 +14,8 @@ ST_MODE_MAPPER = {
 }
 
 
+__name__ = 'stat'
+
 def stat_obj_to_dict(stat_obj):
     pass
 
@@ -57,10 +59,34 @@ def diff_stat_info(file_path, file_type, source, destination, results):
     s_stat = source.lstat(file_path)
     d_stat = destination.lstat(file_path)
 
-    stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat)
-             if x.startswith("st_") and "time" not in x}
+    stat_keys = set(x for x in dir(s_stat) if x.startswith('st') ) | set(x for x in dir(d_stat) if x.startswith('st') )
+    diffs = []
 
-    for k, v in stat_dict:
-        
-    print (s_stat == d_stat)
-    pass
+    for k in stat_keys:
+        # print ("[+]", k, s_stat, d_stat)
+        # print (s_value)
+        try:
+            s_value = getattr(s_stat, k)
+            d_value = getattr(d_stat, k)
+
+            if s_value != d_value:
+                diffs.append(k)
+        except AttributeError:
+            # diffs.append(k)
+            pass
+            continue
+
+    # s_stat_dict = {
+
+    #         x[3:]: getattr(s_stat, x) for x in dir(s_stat)
+    #     }
+
+    # d_stat_dict = {
+    #         x[3:]: getattr(d_stat, x) for x in dir(d_stat)
+    #     }
+
+    if diffs:
+        if file_path not in results:
+            results[file_path] = {}
+        results[file_path][__name__] = diffs
+
