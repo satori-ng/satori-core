@@ -14,7 +14,10 @@ ST_MODE_MAPPER = {
 }
 
 
-@hook("pre_open")
+def stat_obj_to_dict(stat_obj):
+    pass
+
+@hook("imager.pre_open")
 def get_stat_info(satori_image, file_path, file_type):
     file_stat = os.lstat(file_path)
 
@@ -46,3 +49,18 @@ def get_stat_info(satori_image, file_path, file_type):
                     ('type', file_type),
                 force_create=False,
                 )
+
+
+
+@hook("differ.pre_open")
+def diff_stat_info(file_path, file_type, source, destination, results):
+    s_stat = source.lstat(file_path)
+    d_stat = destination.lstat(file_path)
+
+    stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat)
+             if x.startswith("st_") and "time" not in x}
+
+    for k, v in stat_dict:
+        
+    print (s_stat == d_stat)
+    pass

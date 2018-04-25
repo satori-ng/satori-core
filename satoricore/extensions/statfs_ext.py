@@ -3,7 +3,7 @@ import os
 from hooker import hook
 
 
-@hook("pre_open")
+@hook("imager.pre_open")
 def get_statfs_info(satori_image, file_path, file_type):
     # pass
     if os.path.islink(file_path):

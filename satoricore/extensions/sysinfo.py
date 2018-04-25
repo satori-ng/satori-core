@@ -7,7 +7,7 @@ import satoricore
 __name__ = 'sysinfo'
 
 
-@hook("on_start")
+@hook("imager.on_start")
 def sysinfo(parser, args, satori_image):
     satori_meta = {}
     system_meta = {}

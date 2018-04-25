@@ -10,7 +10,7 @@ from multiprocessing.dummy import Pool
 # from multiprocessing import Pool
 
 from hooker import EVENTS
-EVENTS.append(["on_start", "pre_open", "with_open", "post_close", "on_end"])
+EVENTS.append(["imager.on_start", "imager.pre_open", "imager.with_open", "imager.post_close", "imager.on_end"])
 
 from satoricore.crawler import BaseCrawler
 from satoricore.image import SatoriImage
@@ -30,15 +30,15 @@ def file_worker(image, file_desc):
     PROCESSED_FILES += 1
     filename, filetype = file_desc
     image.add_file(filename)
-    EVENTS["pre_open"](satori_image=image, file_path=filename, file_type=filetype)
+    EVENTS["imager.pre_open"](satori_image=image, file_path=filename, file_type=filetype)
     if filetype is not SE.DIRECTORY_T:
         # print (image)
-        if len(EVENTS["with_open"]):
+        if len(EVENTS["imager.with_open"]):
             try:
                 fd = open(filename, 'rb')
-                EVENTS["with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
+                EVENTS["imager.with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
                 fd.close()
-                EVENTS["post_close"](satori_image=image, file_path=filename, file_type=filetype)
+                EVENTS["imager.post_close"](satori_image=image, file_path=filename, file_type=filetype)
             except Exception as e:
                 if not args.quiet:
                     print("[-] %s . File '%s' could not be opened." % (e, filename), file=sys.stderr)
@@ -157,6 +157,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     image = SatoriImage()
     if 'func' in args:
-        EVENTS["on_start"](parser=parser, args=args, satori_image=image)
+        EVENTS["imager.on_start"](parser=parser, args=args, satori_image=image)
         args.func(args, image)
-        EVENTS["on_end"]()
+        EVENTS["imager.on_end"]()
