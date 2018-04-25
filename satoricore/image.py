@@ -195,3 +195,36 @@ class SatoriImage(object):
         sep = ntsep if os_type == 'Windows' else posixsep
 
         return self._walk(entrypoint, sep)
+
+    def stat(self, file_path):
+        stat_dict = self.get_attribute(file_path, 'stat')
+        times_dict = self.get_attribute(file_path, 'times')
+        return self.satori_stat_result(stat_dict, times_dict)
+
+    def lstat(self, file_path):
+        return self.stat(file_path)
+
+
+
+    class satori_stat_result(dict):
+
+        def __init__(self, stat_dict, times_dict, mode_int=0):
+            for k, v in stat_dict.items():
+                stat_key = 'st_%s' % k
+                self.__setitem__(stat_key, v)
+                setattr(self, stat_key, v)
+
+            for k, v in times_dict.items():
+                stat_key = 'st_%s' % k
+                self.__setitem__(stat_key, v)
+                setattr(self, stat_key, v)
+
+
+
+    '''
+from satoricore.serialize import load_image
+im = load_image("bin_test_image.json.gz")
+s = im.stat('/bin/bash')
+
+
+    '''
