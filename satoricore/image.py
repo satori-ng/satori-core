@@ -13,6 +13,9 @@ _TYPE_S = 'type'
 _CONTENTS_S = 'contents'
 _SIZE_S = 'size'
 
+_DATA_SECTION = 'data'
+_META_SECTION = 'meta'
+
 posixsep = pathlib.posixpath.sep
 ntsep = pathlib.ntpath.sep
 
@@ -22,10 +25,30 @@ class SatoriImage(object):
     # listdir = get_dir_contents
     def __init__(self):
         self.__data = {}
-        self.__data['metadata'] = {}
-        self.__data['data'] = {}
-        self.__data['data']['filesystem'] = {}
+        self.__data[_META_SECTION] = {}
+        self.__data[_DATA_SECTION] = {}
+        self.__data[_DATA_SECTION]['filesystem'] = {}
         self.path = os.path     # helps with duck typing against 'os' module
+
+    def add_class(self, class_name, section=_DATA_SECTION):
+        if class_name in self.__data[section]:
+            raise KeyError("The class '{}' already exists in Section {}"
+                .format(
+                    class_name,
+                    section,
+                    )
+                )
+        self.__data[section][class_name] = {}
+
+    def get_class_dict(self, class_name, section=_DATA_SECTION):
+        if class_name not in self.__data[section]:
+            raise KeyError("'{}' does not exist in Section '{}'"
+                .format(
+                class_name,
+                section,
+                )
+            )
+        return self.__data[section][class_name]
 
     def _get_data_struct(self):
         return self.__data
@@ -34,7 +57,7 @@ class SatoriImage(object):
         self.__data = data_struct
 
     def set_metadata(self, attr_dict, metadata_type):
-        self.__data['metadata'][metadata_type] = attr_dict
+        self.__data[_META_SECTION][metadata_type] = attr_dict
 
     def add_file(self, full_path):
         with threading.Lock():
@@ -51,7 +74,7 @@ class SatoriImage(object):
         """
         file_dict = self.__get_file_dict(full_path, force_create=force_create)
         # if ext_name not in _STANDARD_EXT:
-        #     self.__data['metadata']['satori']['extensions'].append(ext_name)
+        #     self.__data[_META_SECTION]['satori']['extensions'].append(ext_name)
         file_dict[ext_name] = attr_dict
         return file_dict
 
@@ -91,7 +114,7 @@ class SatoriImage(object):
         #   //tmp///test_dir/////test_file
         path_tokens = re.split("%s+" % sep, full_path)
         # print (path_tokens)
-        cur_position = self.__data['data']['filesystem']
+        cur_position = self.__data[_DATA_SECTION]['filesystem']
         # print(cur_position)
         for token in path_tokens[:-1]:
             # print (token in cur_position, token)
@@ -191,7 +214,7 @@ class SatoriImage(object):
                 break
 
     def walk(self, entrypoint, **kwargs):
-        os_type = self.__data['metadata']['system']['type']
+        os_type = self.__data[_META_SECTION]['system']['type']
         sep = ntsep if os_type == 'Windows' else posixsep
 
         return self._walk(entrypoint, sep)

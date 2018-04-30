@@ -1,6 +1,6 @@
 import unittest
 
-from satoricore.image import SatoriImage
+from satoricore.image import SatoriImage, _META_SECTION, _DATA_SECTION
 
 
 class test_EmptyImage(unittest.TestCase):
@@ -69,3 +69,29 @@ class test_EmptyImage(unittest.TestCase):
             )
 
         self.assertTrue(si.get_attribute('/tmp/test', 'ext2') == 'value2')
+
+
+    # def test_stat(self):
+    #     si = SatoriImage()
+
+
+    def test_classes(self):
+        si = SatoriImage()
+
+        si.add_class("class1", section=_DATA_SECTION)
+
+        try:
+            si.add_class("class1", section=_DATA_SECTION)
+        except KeyError:
+            self.assertTrue(True)   # Readding a class throws exception
+
+        cd = si.get_class_dict('class1', section=_DATA_SECTION)
+        self.assertTrue(not cd) # New class yields empty dict
+
+        try:
+            cd2 = si.get_class_dict('class2', section=_DATA_SECTION)
+        except KeyError:
+            self.assertTrue(True)   # Non-existent class throws Exception
+
+        # Existent classes are compatible
+        sysinfo = si.get_class_dict('filesystem', section=_DATA_SECTION)
