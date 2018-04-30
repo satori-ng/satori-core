@@ -32,14 +32,22 @@ def file_worker(image, file_desc):
     PROCESSED_FILES += 1
     filename, filetype = file_desc
     image.add_file(filename)
-    EVENTS["imager.pre_open"](satori_image=image, file_path=filename, file_type=filetype)
+    func = EVENTS["imager.pre_open"]
+    func(satori_image=image, file_path=filename, file_type=filetype)
     if filetype is not SE.DIRECTORY_T:
         if len(EVENTS["imager.with_open"]):
             try:
                 fd = open(filename, 'rb')
-                EVENTS["imager.with_open"](satori_image=image, file_path=filename, file_type=filetype, fd=fd)
+                func = EVENTS["imager.with_open"]
+                func(
+                    satori_image=image, file_path=filename,
+                    file_type=filetype, fd=fd,
+                )
                 fd.close()
-                EVENTS["imager.post_close"](satori_image=image, file_path=filename, file_type=filetype)
+                func = EVENTS["imager.post_close"]
+                func(
+                    satori_image=image, file_path=filename, file_type=filetype
+                )
             except Exception as e:
                 if not args.quiet:
                     logger.error(
@@ -78,12 +86,9 @@ def _clone(args, image):
             )
     # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
     pool = Pool(args.threads)
-    pool.starmap(file_worker,       # image, filename, filetype
-                zip(
-                    itertools.repeat(image),
-                    crawler(),
-                )
-            )
+    pool.starmap(  # image, filename, filetype
+        file_worker, zip(itertools.repeat(image), crawler())
+    )
     pool.close()
     pool.join()
 
