@@ -121,7 +121,9 @@ class SatoriImage(object):
         # Get a list from the separated path
         # even if a path has multiple delimiters:
         #   //tmp///test_dir/////test_file
-        path_tokens = re.split(r"%s+" % sep, full_path)
+        path_tokens = pathlib.PurePath(full_path).parts
+        if path_tokens[0] == '/':
+            path_tokens[0] == ''
         # print (path_tokens)
         cur_position = self.__data[_DATA_SECTION]['filesystem']
         # print(cur_position)
