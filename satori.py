@@ -88,67 +88,48 @@ def _clone(args, image):
     image_serializer.write(image, args.image_file)
     print("[+] Stored to file '{}'".format(image_serializer.last_file))
 
-def _diff(args, image):
-    raise NotImplementedError
-
 
 def _setup_argument_parser():
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(
-        help='Satori may run in either clone or diff modes.'
-    )
 
-    clone_parser = subparsers.add_parser(
-        'clone',
-        help=(
-            'Generates an image file containing metadata for each file in the '
-            'specified paths.'
-        ),
-    )
-
-    clone_parser.add_argument(
+    parser.add_argument(
         '-e', '--excluded-dirs',
         help='Exclude files under specified locations.',
         action='append',
     )
 
-    clone_parser.add_argument(
+    parser.add_argument(
         '-l', '--load-extensions',
         help='Load the following extensions',
         action='append',
         default=[],
     )
 
-    clone_parser.add_argument(
+    parser.add_argument(
         '-q', '--quiet',
         help=("Does not show Errors"),
         default=False,
         action='store_true',
     )
 
-    clone_parser.add_argument(
+    parser.add_argument(
         '-t', '--threads',
         help=("Number of threads to use"),
         default=4,
         type=int,
     )
 
-    clone_parser.add_argument(
+    parser.add_argument(
         'entrypoints',
         help='Start iteration using these directories.',
         nargs='+',
     )
 
-    clone_parser.add_argument(
+    parser.add_argument(
         'image_file',
         help='Store the created image in that file',
-        default="%s.str" % os.uname,
+        # default="%s.str" % os.uname,
     )
-
-    clone_parser.set_defaults(func=_clone)
-
-    diff_parser = subparsers.add_parser('diff')
-    diff_parser.set_defaults(func=_diff)
     return parser
 
 
@@ -156,7 +137,6 @@ if __name__ == '__main__':
     parser = _setup_argument_parser()
     args = parser.parse_args()
     image = SatoriImage()
-    if 'func' in args:
-        EVENTS["imager.on_start"](parser=parser, args=args, satori_image=image)
-        args.func(args, image)
-        EVENTS["imager.on_end"]()
+    EVENTS["imager.on_start"](parser=parser, args=args, satori_image=image)
+    _clone(args, image)
+    EVENTS["imager.on_end"]()

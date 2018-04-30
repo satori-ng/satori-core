@@ -60,33 +60,45 @@ def diff_stat_info(file_path, file_type, source, destination, results):
     d_stat = destination.lstat(file_path)
 
     stat_keys = set(x for x in dir(s_stat) if x.startswith('st') ) | set(x for x in dir(d_stat) if x.startswith('st') )
-    diffs = []
 
+    s_times_dict = {
+        'atime': s_stat.st_atime,
+        'mtime': s_stat.st_mtime,
+        'ctime': s_stat.st_ctime,
+    }
+    d_times_dict = {
+        'atime': d_stat.st_atime,
+        'mtime': d_stat.st_mtime,
+        'ctime': d_stat.st_ctime,
+    }
+
+    time_diff_dict = {}
+    diffs = {}
     for k in stat_keys:
-        # print ("[+]", k, s_stat, d_stat)
-        # print (s_value)
         try:
             s_value = getattr(s_stat, k)
             d_value = getattr(d_stat, k)
+            diff = d_value - s_value
+            if diff != 0:
 
-            if s_value != d_value:
-                diffs.append(k)
+                if "time" in k:
+                    time_diff_dict[k] = diff
+                    continue
+
+                diffs[k] = diff
         except AttributeError:
             # diffs.append(k)
             pass
             continue
 
-    # s_stat_dict = {
-
-    #         x[3:]: getattr(s_stat, x) for x in dir(s_stat)
-    #     }
-
-    # d_stat_dict = {
-    #         x[3:]: getattr(d_stat, x) for x in dir(d_stat)
-    #     }
+    if time_diff_dict:
+        results.set_attribute(file_path, time_diff_dict, 'times.diff', force_create=True)
 
     if diffs:
-        if file_path not in results:
-            results[file_path] = {}
-        results[file_path][__name__] = diffs
+        results.set_attribute(file_path, diffs, 'stat.diff', force_create=True)
+
+    # if diffs:
+    #     if file_path not in results:
+    #         results[file_path] = {}
+    #     results[file_path][__name__] = diffs
 
