@@ -14,7 +14,7 @@ _CONTENTS_S = 'contents'
 _SIZE_S = 'size'
 
 _DATA_SECTION = 'data'
-_META_SECTION = 'meta'
+_META_SECTION = 'metadata'
 
 posixsep = pathlib.posixpath.sep
 ntsep = pathlib.ntpath.sep
@@ -29,6 +29,15 @@ class SatoriImage(object):
         self.__data[_DATA_SECTION] = {}
         self.__data[_DATA_SECTION]['filesystem'] = {}
         self.path = os.path     # helps with duck typing against 'os' module
+
+    def add_section(self, section_name):
+        if section_name in self.__data:
+            raise KeyError("The section '{}' already exists in Image"
+                .format(
+                    section_name,
+                    )
+                )
+        self.__data[section_name] = {}
 
     def add_class(self, class_name, section=_DATA_SECTION):
         if class_name in self.__data[section]:
