@@ -7,20 +7,21 @@ import os
 import os.path
 import sys
 from multiprocessing.dummy import Pool
-# from multiprocessing import Pool
 
 from hooker import EVENTS
-EVENTS.append(["imager.on_start", "imager.pre_open", "imager.with_open", "imager.post_close", "imager.on_end"])
 
 from satoricore.crawler import BaseCrawler
 from satoricore.image import SatoriImage
 from satoricore.common import _STANDARD_EXT as SE
 from satoricore.logger import logger
 
-from satoricore.serialize.pickle import SatoriPickler
 from satoricore.serialize.json import SatoriJsoner
 
-from satoricore.extensions import *
+EVENTS.append([
+    "imager.on_start", "imager.pre_open", "imager.with_open",
+    "imager.post_close", "imager.on_end",
+])
+from satoricore.extensions import *  # noqa
 
 
 PROCESSED_FILES = 0
@@ -88,7 +89,6 @@ def _clone(args, image):
 
     logger.info("[*] Processed {} files".format(PROCESSED_FILES))
     logger.info("[+] Image Generated!")
-    # image_serializer = SatoriPickler(compress=False)
     image_serializer = SatoriJsoner()
     image_serializer.write(image, args.image_file)
     logger.info("[+] Stored to file '{}'".format(image_serializer.last_file))
