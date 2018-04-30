@@ -4,7 +4,6 @@ import argparse
 import imp
 import itertools
 import os
-import os.path
 import sys
 from multiprocessing.dummy import Pool
 
@@ -49,11 +48,10 @@ def file_worker(image, file_desc):
                     satori_image=image, file_path=filename, file_type=filetype
                 )
             except Exception as e:
-                if not args.quiet:
-                    logger.error(
-                        "[-] %s . File '%s' could not be opened."
-                        % (e, filename)
-                    )
+                logger.error(
+                    "[-] %s . File '%s' could not be opened."
+                    % (e, filename)
+                )
 
 
 def _clone(args, image):
