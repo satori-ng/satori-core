@@ -39,8 +39,6 @@ def get_stat_info(satori_image, file_path, file_type):
     }
 
     # Translates lstat's attributes to a dict
-    # times_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat)
-    #               if x.startswith("st_") and "time" in x}
     stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat)
                  if x.startswith("st_") and "time" not in x}
 
@@ -87,7 +85,6 @@ def diff_stat_info(file_path, file_type, source, destination, results):
 
                 diffs[k] = diff
         except AttributeError:
-            # diffs.append(k)
             pass
             continue
 
@@ -97,8 +94,4 @@ def diff_stat_info(file_path, file_type, source, destination, results):
     if diffs:
         results.set_attribute(file_path, diffs, 'stat.diff', force_create=True)
 
-    # if diffs:
-    #     if file_path not in results:
-    #         results[file_path] = {}
-    #     results[file_path][__name__] = diffs
 

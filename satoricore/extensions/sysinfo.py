@@ -22,7 +22,7 @@ def sysinfo(parser, args, satori_image):
     system_meta['machine'] = platform.machine()
     system_meta['release'] = platform.release()
     system_meta['processor'] = platform.processor()
-    system_meta['specifics'] = {}
+    # system_meta['specifics'] = {}
 
     satori_image.set_metadata(system_meta, 'system')
     satori_image.set_metadata(satori_meta, 'satori')
