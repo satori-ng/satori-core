@@ -15,6 +15,7 @@ EVENTS.append(["imager.on_start", "imager.pre_open", "imager.with_open", "imager
 from satoricore.crawler import BaseCrawler
 from satoricore.image import SatoriImage
 from satoricore.common import _STANDARD_EXT as SE
+from satoricore.logger import logger
 
 from satoricore.serialize.pickle import SatoriPickler
 from satoricore.serialize.json import SatoriJsoner
@@ -32,7 +33,6 @@ def file_worker(image, file_desc):
     image.add_file(filename)
     EVENTS["imager.pre_open"](satori_image=image, file_path=filename, file_type=filetype)
     if filetype is not SE.DIRECTORY_T:
-        # print (image)
         if len(EVENTS["imager.with_open"]):
             try:
                 fd = open(filename, 'rb')
@@ -41,11 +41,10 @@ def file_worker(image, file_desc):
                 EVENTS["imager.post_close"](satori_image=image, file_path=filename, file_type=filetype)
             except Exception as e:
                 if not args.quiet:
-                    print("[-] %s . File '%s' could not be opened." % (e, filename), file=sys.stderr)
-                # print(
-                #     "[-] %s.  File '%s' could not be opened. " % (str(e), filename),
-                #     file=sys.stdout,
-                #     )
+                    logger.error(
+                        "[-] %s . File '%s' could not be opened."
+                        % (e, filename)
+                    )
 
 
 def _clone(args, image):
@@ -54,10 +53,12 @@ def _clone(args, image):
         if os.path.isdir(entrypoint):
             entrypoints.append(entrypoint)
         else:
-            print ("[-] Entrypoint '{}' is not a Directory".format(entrypoint))
+            logger.error(
+                "[-] Entrypoint '{}' is not a Directory".format(entrypoint)
+            )
     if not entrypoints:
-        print ("[!] No valid Entrypoints Found!")
-        print ("[!] Exiting...")
+        logger.error("[!] No valid Entrypoints Found!")
+        logger.info("[!] Exiting...")
         sys.exit(-1)
     crawler = BaseCrawler(entrypoints, args.excluded_dirs)
     # dispatcher(image, file_queue)
@@ -67,11 +68,15 @@ def _clone(args, image):
                 'extension_{}'.format(i),
                 extension
                 )
-            print("Extension '{}' loaded".format(ext_module.__name__))
+            logger.info("Extension '{}' loaded".format(ext_module.__name__))
         except Exception as e:
-            print ("[-] [{}] - Extension {} could not be loaded".format(e, extension))
+            logger.warning(
+                "[-] [{}] - Extension {} could not be loaded".format(
+                    e, extension
+                )
+            )
     # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
-    pool = Pool(args.threads) 
+    pool = Pool(args.threads)
     pool.starmap(file_worker,       # image, filename, filetype
                 zip(
                     itertools.repeat(image),
@@ -81,12 +86,12 @@ def _clone(args, image):
     pool.close()
     pool.join()
 
-    print ("[*] Processed {} files".format(PROCESSED_FILES))
-    print("[+] Image Generated!")
+    logger.info("[*] Processed {} files".format(PROCESSED_FILES))
+    logger.info("[+] Image Generated!")
     # image_serializer = SatoriPickler(compress=False)
     image_serializer = SatoriJsoner()
     image_serializer.write(image, args.image_file)
-    print("[+] Stored to file '{}'".format(image_serializer.last_file))
+    logger.info("[+] Stored to file '{}'".format(image_serializer.last_file))
 
 
 def _setup_argument_parser():
