@@ -16,8 +16,6 @@ ST_MODE_MAPPER = {
 
 __name__ = 'stat'
 
-def stat_obj_to_dict(stat_obj):
-    pass
 
 @hook("imager.pre_open")
 def get_stat_info(satori_image, file_path, file_type):
@@ -28,7 +26,7 @@ def get_stat_info(satori_image, file_path, file_type):
         file_type = ST_MODE_MAPPER.get(mode, _STANDARD_EXT.UNKNOWN_T)
     if file_type == _STANDARD_EXT.LINK_T:
         points_to = os.path.realpath(file_path)
-        print(points_to)
+        # print(points_to)
         satori_image.set_attribute(file_path, points_to,
                                    'link', force_create=False)
 
@@ -58,7 +56,7 @@ def diff_stat_info(file_path, file_type, source, destination, results):
     d_stat = destination.lstat(file_path)
 
     stat_keys = set(x for x in dir(s_stat) if x.startswith('st') ) | set(x for x in dir(d_stat) if x.startswith('st') )
-
+    # print (file_path)
     s_times_dict = {
         'atime': s_stat.st_atime,
         'mtime': s_stat.st_mtime,

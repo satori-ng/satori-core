@@ -1,7 +1,7 @@
 import os
 import platform
-from hooker import hook
 
+from hooker import hook
 import satoricore
 
 __name__ = 'sysinfo'
