@@ -85,13 +85,13 @@ class test_EmptyImage(unittest.TestCase):
         except KeyError:
             self.assertTrue(True)   # Readding a class throws exception
 
-        cd = si.get_class_dict('class1', section=_DATA_SECTION)
+        cd = si.get_class('class1', section=_DATA_SECTION)
         self.assertTrue(not cd) # New class yields empty dict
 
         try:
-            cd2 = si.get_class_dict('class2', section=_DATA_SECTION)
+            cd2 = si.get_class('class2', section=_DATA_SECTION)
         except KeyError:
             self.assertTrue(True)   # Non-existent class throws Exception
 
         # Existent classes are compatible
-        sysinfo = si.get_class_dict('filesystem', section=_DATA_SECTION)
+        sysinfo = si.get_class('filesystem', section=_DATA_SECTION)

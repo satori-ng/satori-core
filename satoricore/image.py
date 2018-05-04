@@ -3,6 +3,7 @@ import os.path
 import re
 import threading
 import pathlib
+import uuid
 from satoricore.common import _STANDARD_EXT
 
 # Those tags will end up in the __data dict several times
@@ -29,6 +30,10 @@ class SatoriImage(object):
         self.__data[_DATA_SECTION] = {}
         self.__data[_DATA_SECTION]['filesystem'] = {}
         self.path = os.path     # helps with duck typing against 'os' module
+        self.add_class('uuid', section=_META_SECTION, data=str(uuid.uuid4()))
+
+    def get_entrypoints(self):
+        return self.__data[_DATA_SECTION]['filesystem'].keys()
 
     def add_section(self, section_name):
         if section_name in self.__data:
@@ -39,7 +44,18 @@ class SatoriImage(object):
                 )
         self.__data[section_name] = {}
 
-    def add_class(self, class_name, section=_DATA_SECTION):
+    def get_classes(self, section=_DATA_SECTION):
+        if section not in self.__data:
+            raise KeyError("The section '{}' does not exists in Image"
+                .format(
+                    section,
+                    )
+                )
+        return self.__data[section].keys()
+
+    def add_class(self, class_name, section=_DATA_SECTION, data={}):
+        # if not isinstance(data, dict):
+        #     raise TypeError("'data' parameter must be of type 'dict'")
         if class_name in self.__data[section]:
             raise KeyError("The class '{}' already exists in Section {}"
                 .format(
@@ -47,9 +63,9 @@ class SatoriImage(object):
                     section,
                     )
                 )
-        self.__data[section][class_name] = {}
+        self.__data[section][class_name] = data
 
-    def get_class_dict(self, class_name, section=_DATA_SECTION):
+    def get_class(self, class_name, section=_DATA_SECTION):
         if class_name not in self.__data[section]:
             raise KeyError("'{}' does not exist in Section '{}'"
                 .format(
@@ -113,7 +129,7 @@ class SatoriImage(object):
         # Eliminate trailing '/' to make splitting easier
         full_path_orig = full_path
         path_is_dir = full_path.endswith(sep)
-        if full_path.endswith(sep):
+        if full_path.endswith(sep) and full_path != sep:    # 
             full_path = full_path[:-1]
         # while full_path.startswith(sep):
         #     full_path = full_path[1:]
@@ -122,8 +138,10 @@ class SatoriImage(object):
         # even if a path has multiple delimiters:
         #   //tmp///test_dir/////test_file
         path_tokens = pathlib.PurePath(full_path).parts
-        if path_tokens[0] == '/':
-            path_tokens[0] == ''
+        # print(full_path)
+        if path_tokens:
+            if path_tokens[0] == '/':
+                path_tokens[0] == ''
         # print (path_tokens)
         cur_position = self.__data[_DATA_SECTION]['filesystem']
         # print(cur_position)
