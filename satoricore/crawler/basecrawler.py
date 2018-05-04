@@ -1,5 +1,6 @@
 import os
 import operator
+import pathlib
 import functools
 import collections
 
@@ -50,6 +51,16 @@ class BaseCrawler:
             # Iterate over the list from top top bottom so that we may edit the
             # list of directories to be traversed according to the list of
             # excluded dirs.
+
+            entry_parts = pathlib.PurePath(entrypoint).parts
+            to_yield_parts = []
+            entry_path_construct = pathlib.PurePath()
+            for entry_part in entry_parts:
+                entry_path_construct /= entry_part
+                to_yield_parts.append(str(entry_path_construct))
+            print (to_yield_parts)
+            yield (to_yield_parts, [])
+
             for _root, _dirs, _files in self.image.walk(entrypoint, topdown=True):
                 root = self.image.path.abspath(_root)
                 # TODO: This is most probably not needed. Remove after further
