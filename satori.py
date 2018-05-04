@@ -82,7 +82,6 @@ def _clone(args, image):
                     e, extension
                 )
             )
-    # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
     pool = Pool(args.threads)
     pool.starmap(  # image, filename, filetype
         file_worker, zip(itertools.repeat(image), crawler())
