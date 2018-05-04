@@ -1,3 +1,4 @@
+import json
 import os
 import os.path
 import re
@@ -151,10 +152,15 @@ class SatoriImage(object):
                     cur_position = cur_position[token][_CONTENTS_S]
                 # Try Accessing directory contents
                 else:
-                # if _CONTENTS_S not in cur_position[token].keys():
-                    raise NotADirectoryError(
+                    if force_create:    # If it's a part of a force created path - it HAS to be a DIR
+                        cur_position[token][_TYPE_S] = _STANDARD_EXT.DIRECTORY_T
+                        continue
+
+                    raise NotADirectoryError((
                             "File: '{}' in Path: '{}' is not a Directory"
-                            .format(token, full_path_orig)
+                            " - but type '{}'"
+                            )
+                            .format(token, full_path_orig, cur_position[token][_TYPE_S])
                             )
                 # cur_position[token][_CONTENTS_S]
             except KeyError:
@@ -206,7 +212,7 @@ class SatoriImage(object):
         return self.get_dir_contents(full_path)
 
     def __str__(self):
-        return self.__data.__str__()
+        return json.dumps(self.__data)
 
     def __repr__(self):
         return self.__data.__repr__()
@@ -219,17 +225,20 @@ class SatoriImage(object):
         entrypoints = [entrypoint]
 
         def is_dir(x):
-            return x['type'] == _STANDARD_EXT.DIRECTORY_T
+            return x[_TYPE_S] == _STANDARD_EXT.DIRECTORY_T
 
         while True:
             _entrypoint = entrypoints.pop(0)
             _dict_ptr = self.__get_file_dict(_entrypoint, sep=sep)
-            keys = set(_dict_ptr['contents'].keys())
-            _dirs = {key for key in keys if is_dir(_dict_ptr['contents'][key])}
+            keys = set(_dict_ptr[_CONTENTS_S].keys())
+            # print _dict_ptr[_CONTENTS_S][key][_TYPE_S]
+            _dirs = {
+                    key for key in keys 
+                        if _dict_ptr[_CONTENTS_S][key][_TYPE_S]==_STANDARD_EXT.DIRECTORY_T
+                    }
             _files = keys - _dirs
             _dirs = list(_dirs)
             _files = list(_files)
-
             yield _entrypoint, _dirs, _files
 
             # print(entrypoints)
