@@ -95,6 +95,7 @@ class BaseCrawler:
                         _folder_list.append(file_full_path)
 
                     list_to_append.append(file_full_path)
+                # yield all collected files from consumed directory
                 yield (dirs, files)
 
 
