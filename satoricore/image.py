@@ -281,7 +281,7 @@ class SatoriImage(object):
 
 
     '''
-from satoricore.serialize import load_image
+from satoricore.file import load_image
 im = load_image("bin_test_image.json.gz")
 s = im.stat('/bin/bash')
 

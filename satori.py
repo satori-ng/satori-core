@@ -14,7 +14,7 @@ from satoricore.image import SatoriImage
 from satoricore.common import _STANDARD_EXT as SE
 from satoricore.logger import logger
 
-from satoricore.serialize.json import SatoriJsoner
+from satoricore.file.json import SatoriJsoner
 
 EVENTS.append([
     "imager.on_start", "imager.pre_open", "imager.with_open",
@@ -82,7 +82,6 @@ def _clone(args, image):
                     e, extension
                 )
             )
-    # os.chdir("satoricore" + os.sep + "hooker" + os.sep + "defaults")
     pool = Pool(args.threads)
     pool.starmap(  # image, filename, filetype
         file_worker, zip(itertools.repeat(image), crawler())

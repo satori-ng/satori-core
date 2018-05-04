@@ -3,6 +3,7 @@ import operator
 import pathlib
 import functools
 import collections
+from stat import S_ISDIR
 
 from satoricore.common import _STANDARD_EXT as SE
 
@@ -48,10 +49,10 @@ class BaseCrawler:
 
     def _iter_entrypoints(self):
         for entrypoint in self.entrypoints:
-            # Iterate over the list from top top bottom so that we may edit the
-            # list of directories to be traversed according to the list of
-            # excluded dirs.
 
+            # Yield all directories up to the entrypoint:
+            # Entrypoint: /var/www/html
+            # Becomes: /, /var, /var/www, /var/www/html
             entry_parts = pathlib.PurePath(entrypoint).parts
             to_yield_parts = []
             entry_path_construct = pathlib.PurePath()
@@ -60,25 +61,42 @@ class BaseCrawler:
                 to_yield_parts.append(str(entry_path_construct))
             yield (to_yield_parts, [])
 
-            for _root, _dirs, _files in self.image.walk(entrypoint, topdown=True):
-                root = self.image.path.abspath(_root)
-                # TODO: This is most probably not needed. Remove after further
-                # testing.
-                if root in self.excluded_dirs:
+            # Create a Queue with the folder paths to crawl 
+            _folder_list = [entrypoint]
+            for _folder_consume in _folder_list:
+                root_path = _folder_consume
+                dirs = []
+                files = []
+
+                # For Every Folder to crawl get its contents
+                try:
+                    _folder_consume_contents = self.image.listdir(_folder_consume)
+                except PermissionError: # TODO: log the failure as at 'info' level 
+                    # If listing fails, just ignore
                     continue
 
-                # Edit _dirs inplace to avoid iterating over subdirectories of
-                # directories in the excluded_dirs iterable.
-                # Only works with topdown=True
-                _dirs[:] = [
-                    d
-                    for d in _dirs
-                    if os.path.join(root, d) not in self.excluded_dirs
-                ]
-                dirs = [os.path.join(root, d) for d in _dirs]
-                files = [os.path.join(root, f) for f in _files]
+                for _file in _folder_consume_contents:
+                    # Contruct the full path of each file
+                    file_full_path = self.image.path.join(root_path, _file)
 
+                    # If file/folder is to be excluded - ignore
+                    if file_full_path in self.excluded_dirs:
+                        continue
+
+                    # By default - treat it as regular file
+                    list_to_append = files
+
+                    # If it is a dorectory
+                    mode = self.image.lstat(file_full_path).st_mode
+                    if S_ISDIR(mode):
+                        # Treat it as a directory
+                        # Get it into queue to dive in later
+                        list_to_append = dirs
+                        _folder_list.append(file_full_path)
+
+                    list_to_append.append(file_full_path)
                 yield (dirs, files)
+
 
     def __call__(self):
         for dirs, files in self._iter_entrypoints():
