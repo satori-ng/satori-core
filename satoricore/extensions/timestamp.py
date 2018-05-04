@@ -16,4 +16,3 @@ def set_timestamp(parser, args, satori_image):
 	times['tz-secs'] = tz=time.timezone
 
 	satori_image.add_class("timestamp", section=_META_SECTION, data=times)
-

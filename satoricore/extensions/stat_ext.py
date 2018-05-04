@@ -51,7 +51,7 @@ def get_stat_info(satori_image, file_path, file_type):
 
 
 @hook("differ.pre_open")
-def diff_stat_info(file_path, file_type, source, destination, results):
+def diff_stat_info(file_path, file_type, source, destination, results, diff_name):
     s_stat = source.lstat(file_path)
     d_stat = destination.lstat(file_path)
 
@@ -86,10 +86,16 @@ def diff_stat_info(file_path, file_type, source, destination, results):
             pass
             continue
 
+    times_attr = 'times.{diff_name}'.format(diff_name=diff_name)
+    stat_attr = 'stat.{diff_name}'.format(diff_name=diff_name)
+    diff_dict = {}
+
     if time_diff_dict:
-        results.set_attribute(file_path, time_diff_dict, 'times.diff', force_create=True)
+        diff_dict['times'] = time_diff_dict
 
     if diffs:
-        results.set_attribute(file_path, diffs, 'stat.diff', force_create=True)
+        diff_dict['stat'] = diffs
 
+    if diff_dict:
+        results.set_attribute(file_path, diff_dict, diff_name, force_create=True)
 
