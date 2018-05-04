@@ -58,7 +58,6 @@ class BaseCrawler:
             for entry_part in entry_parts:
                 entry_path_construct /= entry_part
                 to_yield_parts.append(str(entry_path_construct))
-            print (to_yield_parts)
             yield (to_yield_parts, [])
 
             for _root, _dirs, _files in self.image.walk(entrypoint, topdown=True):
