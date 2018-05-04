@@ -14,7 +14,7 @@ from satoricore.image import SatoriImage
 from satoricore.common import _STANDARD_EXT as SE
 from satoricore.logger import logger
 
-from satoricore.serialize.json import SatoriJsoner
+from satoricore.file.json import SatoriJsoner
 
 EVENTS.append([
     "imager.on_start", "imager.pre_open", "imager.with_open",

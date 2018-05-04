@@ -2,8 +2,8 @@ import os
 import unittest
 
 from satoricore.image import SatoriImage
-from satoricore.serialize.pickle import SatoriPickler
-from satoricore.serialize.json import SatoriJsoner
+from satoricore.file.pickle import SatoriPickler
+from satoricore.file.json import SatoriJsoner
 
 
 class test_Serializers(unittest.TestCase):
@@ -18,7 +18,7 @@ class test_Serializers(unittest.TestCase):
 
         str_jsn_com = SatoriJsoner()
         str_jsn = SatoriJsoner(compress=False)
-        self.serializers = [
+        self.filers = [
             str_jsn_com, str_jsn,
             str_pkl_com, str_pkl,
         ]
@@ -29,13 +29,13 @@ class test_Serializers(unittest.TestCase):
             pass
         os.chdir("gen_images")
 
-        for serializer in self.serializers:
+        for serializer in self.filers:
             serializer.write(self.image, 'test')
         os.listdir('.')
 
 
     def test_create_image(self):
-        for serializer in self.serializers:
+        for serializer in self.filers:
             image = serializer.read('test', suffixed=False)
             self.assertTrue(image == self.image)
 
