@@ -137,14 +137,12 @@ class SatoriImage(object):
         # Get a list from the separated path
         # even if a path has multiple delimiters:
         #   //tmp///test_dir/////test_file
-        path_tokens = pathlib.PurePath(full_path).parts
-        # print(full_path)
-        if path_tokens:
-            if path_tokens[0] == '/':
-                path_tokens[0] == ''
-        # print (path_tokens)
+        path_tokens = list(pathlib.PurePath(full_path).parts)
+        # Workaround for '///etc' paths
+        path_tokens[0] = re.sub(r'/+', r'/', path_tokens[0])    
+
         cur_position = self.__data[_DATA_SECTION]['filesystem']
-        # print(cur_position)
+
         for token in path_tokens[:-1]:
             # print (token in cur_position, token)
             try:
@@ -182,7 +180,7 @@ class SatoriImage(object):
                         _TYPE_S: last_file_type,    # If path ends with '/' declare file as directory
                     }
             if path_is_dir:
-                cur_position['_CONTENTS_S'] = {}
+                cur_position[file_token][_CONTENTS_S] = {}
             # print (cur_position)
         try:
             return cur_position[file_token]

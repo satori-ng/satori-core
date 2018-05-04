@@ -40,6 +40,21 @@ class test_EmptyImage(unittest.TestCase):
         self.assertTrue('sudoers' in con)
 
 
+    def test_paths(self):
+        si = SatoriImage()
+
+        si.add_file("/etc/shadow")
+        si.add_file("/etc/dir/")
+        self.assertTrue(si.is_dir("/etc/"))
+        self.assertTrue(si.is_dir("/"))
+        self.assertTrue(si.is_dir("/etc/dir"))
+        self.assertTrue(si.is_dir("/etc/dir/"))
+        self.assertTrue(si.is_dir("/etc///dir/"))
+        self.assertTrue(si.is_dir("//"))
+        self.assertTrue(si.is_dir("/etc///"))
+        self.assertTrue(si.is_dir("//etc"))
+
+
     def test_listing_non_dir(self):
         si = SatoriImage()
 
