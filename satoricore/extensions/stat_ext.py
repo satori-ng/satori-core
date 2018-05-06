@@ -1,5 +1,3 @@
-import os
-import os.path
 import stat
 from hooker import hook
 from satoricore.common import _STANDARD_EXT
@@ -18,23 +16,28 @@ __name__ = 'stat'
 
 
 @hook("imager.pre_open")
-def get_stat_info(satori_image, file_path, file_type):
-    file_stat = os.lstat(file_path)
+def get_stat_info(satori_image, file_path, file_type, os_context):
+    file_stat = os_context.lstat(file_path)
 
     if file_type != _STANDARD_EXT.DIRECTORY_T:
         mode = stat.S_IFMT(file_stat.st_mode)
         file_type = ST_MODE_MAPPER.get(mode, _STANDARD_EXT.UNKNOWN_T)
     if file_type == _STANDARD_EXT.LINK_T:
-        points_to = os.path.realpath(file_path)
+        points_to = os_context.path.realpath(file_path)
         # print(points_to)
         satori_image.set_attribute(file_path, points_to,
                                    'link', force_create=False)
 
-    times_dict = {
-        'atime': file_stat.st_atime,
-        'mtime': file_stat.st_mtime,
-        'ctime': file_stat.st_ctime,
-    }
+    # print (file_stat)
+    times_dict = {}
+    time_tags = ['st_atime', 'st_mtime', 'st_ctime']
+
+    for tag in time_tags:
+        try:
+            # print (dir(file_stat))
+            times_dict[tag.replace('st_','')] = getattr(file_stat, tag)
+        except AttributeError:
+            pass
 
     # Translates lstat's attributes to a dict
     stat_dict = {x[3:]: getattr(file_stat, x) for x in dir(file_stat)
