@@ -1,5 +1,6 @@
 # satori-core
-The core functionalities of the Satori-NG Suite
+The core functionalities of the Satori-NG Suite.
+File System (and more) *Greppable/Diffable* Serialization
 
 ## Contents
 The *Satori-NG Core* consists of the *Satori Image File* basic format implementations, along with the `SatoriImage` class, and common functions.
