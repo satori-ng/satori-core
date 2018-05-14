@@ -15,53 +15,57 @@ def display_image(image):
 					),
 		)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('filename', 
-					help="The file that will be parsed as SatoriImage"
-					)
 
-parser.add_argument('--type', '-t',
-					help="The type of serialization of the file",
-					default=None
-					)
+def main():
 
-parser.add_argument('--quiet', '-q',
-					help=("Does not print a beautified JSON"
-					"representation of the SatoriImage"),
-					default=False,
-					action='store_true',
-					)
+	parser = argparse.ArgumentParser()
+	parser.add_argument('filename', 
+						help="The file that will be parsed as SatoriImage"
+						)
 
-args = parser.parse_args()
+	parser.add_argument('--quiet', '-q',
+						help=("Does not print a beautified JSON "
+						"representation of the SatoriImage"),
+						default=False,
+						action='store_true',
+						)
 
-satori_pkl = SatoriPickler()
-satori_jsn = SatoriJsoner()
-satori_pkl_uncompress = SatoriPickler(compress=False)
-satori_jsn_uncompress = SatoriJsoner(compress=False)
+	args = parser.parse_args()
 
-image_serializers = [
-						satori_pkl,
-						satori_jsn,
-						satori_pkl_uncompress,
-						satori_jsn_uncompress,
-					]
+	satori_pkl = SatoriPickler()
+	satori_jsn = SatoriJsoner()
+	satori_pkl_uncompress = SatoriPickler(compress=False)
+	satori_jsn_uncompress = SatoriJsoner(compress=False)
 
-for serializer in image_serializers:
-	try:
-		image = serializer.read(args.filename)
-		if not args.quiet:
-			display_image(image)
+	image_serializers = [
+							satori_pkl,
+							satori_jsn,
+							satori_pkl_uncompress,
+							satori_jsn_uncompress,
+						]
 
-		print("[+] File is a {compress} {type} SatoriImage"
-			.format(
-					compress="compressed" if serializer.compress else "",
-					type=serializer._type
-				),
-				file=sys.stderr,
-			)
-		break
-	except Exception as e:
-		print(
-			"[!] {}".format(e),
-			file=sys.stderr,
-			)
+	for serializer in image_serializers:
+		try:
+			image = serializer.read(args.filename)
+			if not args.quiet:
+				display_image(image)
+
+			print("[+] File is a {compress} {type} SatoriImage"
+				.format(
+						compress="compressed" if serializer.compress else "",
+						type=serializer._type
+					),
+					file=sys.stderr,
+				)
+			return
+		except Exception as e:
+			# print(
+			# 	"[!] {}".format(e),
+			# 	file=sys.stderr,
+			# 	)
+			pass
+	print ("File '{}' is not of a known SatoriImage format".format(args.filename))
+
+
+if '__main__' == __name__:
+	main()

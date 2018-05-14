@@ -57,10 +57,9 @@ def load_image(filename):
 	for serializer in image_serializers:
 		try:
 			image = serializer.read(filename)
-			# print (filename)
 			return image
 		except Exception as e:
 			# print("[-] {}".format(e))
 			pass
 
-	return None
+	raise ValueError("File {} is not in a known SatoriImage format".format(filename))
