@@ -58,18 +58,14 @@ def diff_stat_info(file_path, file_type, source, destination, results, diff_name
     s_stat = source.lstat(file_path)
     d_stat = destination.lstat(file_path)
 
-    stat_keys = set(x for x in dir(s_stat) if x.startswith('st') ) | set(x for x in dir(d_stat) if x.startswith('st') )
+    stat_keys = set(x for x in dir(s_stat) if x.startswith('st_') ) & set(x for x in dir(d_stat) if x.startswith('st_') )
+    time_keys = [ x for x in stat_keys if x.endswith('time') ]
     # print (file_path)
-    s_times_dict = {
-        'atime': s_stat.st_atime,
-        'mtime': s_stat.st_mtime,
-        'ctime': s_stat.st_ctime,
-    }
-    d_times_dict = {
-        'atime': d_stat.st_atime,
-        'mtime': d_stat.st_mtime,
-        'ctime': d_stat.st_ctime,
-    }
+    s_times_dict = {}
+    d_times_dict = {}
+    for time_key in time_keys:
+        s_times_dict[time_key] = getattr(s_stat, time_key)
+        d_times_dict[time_key] = getattr(d_stat, time_key)
 
     time_diff_dict = {}
     diffs = {}
