@@ -13,7 +13,12 @@ setup(
     author="Satori-NG org",
     author_email=satoricore.__email__,
 
-    packages=["satoricore"],
+    packages=[
+        "satoricore",
+        "satoricore.file",
+        "satoricore.crawler",
+        "satoricore.extensions",
+    ],
 
     entry_points={
         "console_scripts": [

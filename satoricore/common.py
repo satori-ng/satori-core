@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import os
+
 from satoricore.logger import logger
 
 
@@ -20,6 +21,8 @@ def dummy_context(obj):
     yield obj
 
 def get_image_context_from_arg(arg, allow_local=True):
+
+    from satoricore.file import load_image
 
     if arg == '.':
         return dummy_context(os)
