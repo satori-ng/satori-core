@@ -1,5 +1,6 @@
 # satori-core
 The core functionalities of the Satori-NG Suite.
+  
 File System (and more) *Greppable/Diffable* Serialization
 
 ## Contents
