@@ -9,6 +9,7 @@ setup(
     name=satoricore.__name__,
     description=satoricore.__desc__,
     version=satoricore.__version__,
+    url=satoricore.__url__,
 
     author="Satori-NG org",
     author_email=satoricore.__email__,
