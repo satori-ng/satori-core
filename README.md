@@ -7,19 +7,19 @@ File System (and more) *Greppable/Diffable* Serialization
 The *Satori-NG Core* consists of the *Satori Image File* basic format implementations, along with the `SatoriImage` class, and common functions.
   
 
-### The `satoricore.file` package `__main__`
+### The `satori-file` entrypoint
 The package contains a *Satori Image File* checker and reader that can be run with:
 
 #### Check if a file is a *Satori Image File*
 ```bash
-$ python -m satoricore.file -q test_image.json.gz 
+$ satori-file -q test_image.json.gz 
 [!] invalid load key, '{'.
 [+] File is a compressed JSON SatoriImage 
 ```
 
 #### Print a Satori Image File as JSON 
 ```bash
-$ python -m satoricore.file test_image5.json.gz
+$ satori-file test_image.json.gz
 [!] invalid load key, '{'.
 [+] File is a compressed JSON SatoriImage
 {
