@@ -263,7 +263,12 @@ class SatoriImage(object):
     def lstat(self, file_path):
         return self.stat(file_path)
 
-
+    def _get_file_attribute(self, file_path, attr):
+        fdict = __get_file_dict(file_path)
+        if attr not in fdict:
+            raise KeyError("File '{}' does not have the attribute '{}'".
+                    format(file_path, attr)
+                )
 
     class satori_stat_result(dict):
 
