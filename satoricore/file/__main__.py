@@ -46,6 +46,7 @@ def main():
 							satori_jsn_uncompress,
 						]
 
+
 	for serializer in image_serializers:
 		try:
 			image = serializer.read(args.filename)
@@ -59,10 +60,15 @@ def main():
 					),
 				)
 			return True
+
+		except FileNotFoundError as fe:
+			logger.critical("File '{}' not found".format(args.filename))
+			sys.exit(-2)
+
 		except Exception as e:
 			logger.debug(e)
 
-	logger.warn("File '{}' is not of a known SatoriImage format"
+	logger.error("File '{}' is not of a known SatoriImage format"
 		.format(
 				args.filename,
 			)
