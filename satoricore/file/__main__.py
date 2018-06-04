@@ -4,15 +4,17 @@ import sys
 
 from satoricore.file.pickle import SatoriPickler
 from satoricore.file.json import SatoriJsoner
+from satoricore.logger import logger
 
 
 def display_image(image):
 	data_struct = image._get_data_struct()
 	print(
-		json.dumps(data_struct,
-					indent=1,
-					separators=(',',':')
-					),
+		json.dumps(
+				data_struct,
+				indent=1,
+				separators=(',',':'),
+			),
 		)
 
 
@@ -50,21 +52,21 @@ def main():
 			if not args.quiet:
 				display_image(image)
 
-			print("[+] File is a {compress} {type} SatoriImage"
+			logger.info("File is a {compress} {type} SatoriImage"
 				.format(
 						compress="compressed" if serializer.compress else "",
 						type=serializer._type
 					),
-					file=sys.stderr,
 				)
-			return
+			return True
 		except Exception as e:
-			# print(
-			# 	"[!] {}".format(e),
-			# 	file=sys.stderr,
-			# 	)
-			pass
-	print ("File '{}' is not of a known SatoriImage format".format(args.filename))
+			logger.debug(e)
+
+	logger.warn("File '{}' is not of a known SatoriImage format"
+		.format(
+				args.filename,
+			)
+		)
 
 
 if '__main__' == __name__:
