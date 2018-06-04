@@ -11,17 +11,25 @@ LOG_LEVEL = logging.INFO
 # Found in:
 # 'https://stackoverflow.com/questions/14844970/modifying-logging-message-format-based-on-message-logging-level-in-python3'
 
-class MyFormatter(logging.Formatter):
-
-	dbg_fmt  = colored("[@]: %(module)s: %(lineno)d: %(msg)s", "grey")
-	crit_fmt = colored("[X] %(msg)s", "red", attrs=["bold"])
-	err_fmt  = colored("[-] %(msg)s", "red")
-	warn_fmt = colored("[!] %(msg)s", "cyan")
-	info_fmt = colored("[+] %(msg)s", "green")
+class SatoriLogFormatter(logging.Formatter):
 
 
-	def __init__(self, fmt="%(levelno)s: %(msg)s"):
+	def __init__(self, fmt="%(levelno)s: %(msg)s", extension=False):
 		super().__init__(fmt=fmt, datefmt=None, style='%')
+		if extension:
+			mod_tag = "<ext:%(module)s>"
+		else:
+			mod_tag = ""
+
+		self.dbg_fmt  = colored(
+			"[@]{} %(module)s: %(lineno)d: %(msg)s"
+			.format(mod_tag),
+			"grey"
+			)
+		self.crit_fmt = colored("[X]{} %(msg)s".format(mod_tag), "red", attrs=["bold"])
+		self.err_fmt  = colored("[-]{} %(msg)s".format(mod_tag), "red")
+		self.warn_fmt = colored("[!]{} %(msg)s".format(mod_tag), "green")
+		self.info_fmt = colored("[+]{} %(msg)s".format(mod_tag), "cyan")
 
 	def format(self, record):
 
@@ -31,19 +39,20 @@ class MyFormatter(logging.Formatter):
 
 		# Replace the original format with one customized by logging level
 		if record.levelno == logging.DEBUG:
-			self._style._fmt = MyFormatter.dbg_fmt
+			self._style._fmt = self.dbg_fmt
 
 		elif record.levelno == logging.INFO:
-			self._style._fmt = MyFormatter.info_fmt
+			self._style._fmt = self.info_fmt
 
 		elif record.levelno == logging.ERROR:
-			self._style._fmt = MyFormatter.err_fmt
+			self._style._fmt = self.err_fmt
 
 		elif record.levelno == logging.WARN:
-			self._style._fmt = MyFormatter.warn_fmt
+			self._style._fmt = self.warn_fmt
 
 		elif record.levelno == logging.CRITICAL:
-			self._style._fmt = MyFormatter.crit_fmt
+			self._style._fmt = self.crit_fmt
+
 		# Call the original formatter class to do the grunt work
 		result = logging.Formatter.format(self, record)
 
@@ -54,10 +63,29 @@ class MyFormatter(logging.Formatter):
 
 
 handler = logging.StreamHandler()
-fmt = MyFormatter('%(message)s')
+fmt = SatoriLogFormatter()
 handler.setFormatter(fmt)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(LOG_LEVEL)
 logger.addHandler(handler)
 
+
+def set_quiet_logger():
+	global logger
+	logger.setLevel(logging.WARN)
+
+
+def set_debug_logger():
+	global logger
+	logger.setLevel(logging.DEBUG)
+
+
+
+ext_handler = logging.StreamHandler()
+ext_fmt = SatoriLogFormatter('%(message)s', extension=True)
+ext_handler.setFormatter(ext_fmt)
+
+ext_logger = logging.getLogger("{}_ext".format(__name__))
+ext_logger.setLevel(LOG_LEVEL)
+ext_logger.addHandler(ext_handler)

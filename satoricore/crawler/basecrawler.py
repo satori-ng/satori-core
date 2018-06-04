@@ -3,6 +3,7 @@ import operator
 import pathlib
 import functools
 import collections
+from satoricore.logger import logger
 from stat import S_ISDIR
 
 from satoricore.common import _STANDARD_EXT as SE
@@ -71,9 +72,18 @@ class BaseCrawler:
                 # For Every Folder to crawl get its contents
                 try:
                     _folder_consume_contents = self.image.listdir(_folder_consume)
-                except PermissionError: # TODO: log the failure as at 'info' level 
+                except PermissionError:
                     # If listing fails, just ignore
+                    logger.info("Directory '{}' could not be listed"
+                            .format(_folder_consume)
+                        )
                     continue
+                except FileNotFoundError:
+                    logger.info("Directory '{}' could not be found"
+                            .format(_folder_consume)
+                        )
+                    continue
+
 
                 for _file in _folder_consume_contents:
                     # Contruct the full path of each file
@@ -86,8 +96,14 @@ class BaseCrawler:
                     # By default - treat it as regular file
                     list_to_append = files
 
-                    # If it is a dorectory
-                    mode = self.image.lstat(file_full_path).st_mode
+                    # If it is a directory
+                    try:
+                        mode = self.image.lstat(file_full_path).st_mode
+                    except FileNotFoundError:
+                        logger.info("File '{}' could not be found"
+                                .format(file_full_path)
+                            )
+                        continue
                     if S_ISDIR(mode):
                         # Treat it as a directory
                         # Get it into queue to dive in later

@@ -12,7 +12,7 @@ def set_timestamp(parser, args, satori_image):
 
 	times = {}
 	times['tstamp'] = time.time()
-	times['unix'] = date=time.ctime()
-	times['tz-secs'] = tz=time.timezone
+	times['unix'] = time.ctime()
+	times['tz-secs'] = time.timezone
 
 	satori_image.add_class("timestamp", section=_META_SECTION, data=times)

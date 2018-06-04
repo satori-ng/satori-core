@@ -1,6 +1,7 @@
 import stat
 from hooker import hook
 from satoricore.common import _STANDARD_EXT
+from satoricore.logger import ext_logger
 
 ST_MODE_MAPPER = {
     stat.S_IFBLK: _STANDARD_EXT.BLOCK_DEVICE_T,
@@ -17,13 +18,22 @@ __name__ = 'stat'
 
 @hook("imager.pre_open")
 def get_stat_info(satori_image, file_path, file_type, os_context):
-    file_stat = os_context.lstat(file_path)
+    try:
+        file_stat = os_context.lstat(file_path)
+    except FileNotFoundError:
+        ext_logger.info("File '{}' could not be found".format(file_path))
+        satori_image.add_file(file_path)
+        return
 
     if file_type != _STANDARD_EXT.DIRECTORY_T:
         mode = stat.S_IFMT(file_stat.st_mode)
         file_type = ST_MODE_MAPPER.get(mode, _STANDARD_EXT.UNKNOWN_T)
     if file_type == _STANDARD_EXT.LINK_T:
-        points_to = os_context.path.realpath(file_path)
+        try:
+            points_to = os_context.path.realpath(file_path)
+        except PermissionError:
+            ext_logger.info("Symlink '{}' could not be read".format(file_path))
+            points_to = "N/A"
         # print(points_to)
         satori_image.set_attribute(file_path, points_to,
                                    'link', force_create=False)
