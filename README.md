@@ -1,7 +1,11 @@
 # satori-core
 The core functionalities of the Satori-NG Suite.
+
+![logo5](https://github.com/satori-ng/Logos/blob/master/logos/light/logo5.png)
   
-File System (and more) *Greppable/Diffable* Serialization
+[![PyPI version](https://badge.fury.io/py/satori-core.svg)](https://pypi.org/project/satori-core/) - `pip install satori-core`
+
+
 
 ## Contents
 The *Satori-NG Core* consists of the *Satori Image File* basic format implementations, along with the `SatoriImage` class, and common functions.
