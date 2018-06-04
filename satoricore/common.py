@@ -37,6 +37,7 @@ def get_image_context_from_arg(arg, allow_local=True):
         if source != None:
             return dummy_context(source)
     except FileNotFoundError:
+        logger.error("File '{}' could not be found".format(arg))
         pass
 
     try:
@@ -51,8 +52,28 @@ def get_image_context_from_arg(arg, allow_local=True):
         # with conn_context_source as context:
         #     return context
     except ImportError:
-        logger.warn("'satoriremote' package not available, remote paths can't be used")
+        logger.error("'satori-remote' package not available, remote paths can't be used")
     except ValueError:  # If can't be parsed as regular expression
-        pass
+        logger.error("'{}' can't be parsed as URI".format(arg))
     except ConnectionError:
-        logger.warn("Connection failed for path '{}'".format(arg))
+        logger.error("Connection failed for path '{}'".format(arg))
+        sys.exit(-1)
+
+
+def load_extension_list(extension_list):
+    """
+    extension_list: list of filenames 
+    """
+    for i, extension in enumerate(extension_list):
+        try:
+            ext_module = imp.load_source(
+                'extension_{}'.format(i),
+                extension
+                )
+            logger.info("Extension '{}' loaded".format(ext_module.__name__))
+        except Exception as e:
+            logger.warning(
+                "[-] [{}] - Extension {} could not be loaded".format(
+                    e, extension
+                )
+            )
