@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import os
+import imp
 import sys
 
 from satoricore.logger import logger
@@ -33,7 +34,7 @@ def get_image_context_from_arg(arg, allow_local=True):
 
             image_path = arg
             source = load_image(image_path)
-            # print (arg)
+
             if source != None:
                 return dummy_context(source)
         except FileNotFoundError:
@@ -79,3 +80,14 @@ def load_extension_list(extension_list):
                     e, extension
                 )
             )
+
+
+def expose(base, target, attr_name, target_name = None):
+    attr = getattr(target, attr_name)
+    if target_name == None:
+        target_name = attr_name
+    setattr(base, target_name, attr)
+
+def expose_list(base, target, attr_list):
+    for attr in attr_list:
+        expose(base, target, attr)

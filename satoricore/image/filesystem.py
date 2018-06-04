@@ -1,96 +1,36 @@
-import json
 import os
-import os.path
-import re
 import threading
 import pathlib
-import uuid
+import re
+
 from satoricore.common import _STANDARD_EXT
 
 # Those tags will end up in the __data dict several times
 # _S for Tag
 # _T for Type
 # Here they can be globally minified
+
 _TYPE_S = 'type'
 _CONTENTS_S = 'contents'
 _SIZE_S = 'size'
 
-_DATA_SECTION = 'data'
-_META_SECTION = 'metadata'
-
-posixsep = pathlib.posixpath.sep
-ntsep = pathlib.ntpath.sep
-
-
-class SatoriImage(object):
-
-    # listdir = get_dir_contents
-    def __init__(self):
-        self.__data = {}
-        self.__data[_META_SECTION] = {}
-        self.__data[_DATA_SECTION] = {}
-        self.__data[_DATA_SECTION]['filesystem'] = {}
-        self.path = os.path     # helps with duck typing against 'os' module
-        self.add_class('uuid', section=_META_SECTION, data=str(uuid.uuid4()))
-
-    def get_entrypoints(self):
-        return self.__data[_DATA_SECTION]['filesystem'].keys()
-
-    def add_section(self, section_name):
-        if section_name in self.__data:
-            raise KeyError("The section '{}' already exists in Image"
-                .format(
-                    section_name,
-                    )
-                )
-        self.__data[section_name] = {}
-
-    def get_classes(self, section=_DATA_SECTION):
-        if section not in self.__data:
-            raise KeyError("The section '{}' does not exists in Image"
-                .format(
-                    section,
-                    )
-                )
-        return self.__data[section].keys()
-
-    def add_class(self, class_name, section=_DATA_SECTION, data={}):
-        # if not isinstance(data, dict):
-        #     raise TypeError("'data' parameter must be of type 'dict'")
-        if class_name in self.__data[section]:
-            raise KeyError("The class '{}' already exists in Section {}"
-                .format(
-                    class_name,
-                    section,
-                    )
-                )
-        self.__data[section][class_name] = data
-
-    def get_class(self, class_name, section=_DATA_SECTION):
-        if class_name not in self.__data[section]:
-            raise KeyError("'{}' does not exist in Section '{}'"
-                .format(
-                class_name,
-                section,
-                )
-            )
-        return self.__data[section][class_name]
-
-    def _get_data_struct(self):
-        return self.__data
-
-    def _set_data_struct(self, data_struct):
-        self.__data = data_struct
-
-    def set_metadata(self, attr_dict, metadata_type):
-        self.__data[_META_SECTION][metadata_type] = attr_dict
+class SatoriFileSystemImage(dict):
 
     def add_file(self, full_path):
         with threading.Lock():
             self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
 
     def get_attribute(self, full_path, attr):
-        return self.__get_file_dict(full_path).get(attr, {})
+        return self._get_file_attribute(full_path, attr)
+
+    def _get_file_attribute(self, file_path, attr):
+        fdict = self.__get_file_dict(file_path)
+        if attr not in fdict:
+            raise KeyError("File '{}' does not have the attribute '{}'".
+                    format(file_path, attr)
+                )
+        return fdict[attr]
+
 
     def set_attribute(self, full_path, attr_dict,
                       ext_name, force_create=False):
@@ -142,7 +82,7 @@ class SatoriImage(object):
         # Workaround for '///etc' paths
         path_tokens[0] = re.sub(r'/+', r'/', path_tokens[0])    
 
-        cur_position = self.__data[_DATA_SECTION]['filesystem']
+        cur_position = self
 
         for token in path_tokens[:-1]:
             # print (token in cur_position, token)
@@ -193,6 +133,7 @@ class SatoriImage(object):
         except KeyError:
             raise FileNotFoundError("Does not exist: '{}'".format(full_path_orig))
 
+	# ========== os specifics
     def is_dir(self, full_path):
         dir_dict = self.__get_file_dict(full_path)
         # print(dir_dict[_TYPE_S], full_path)
@@ -211,16 +152,7 @@ class SatoriImage(object):
     def listdir(self, full_path):
         return self.get_dir_contents(full_path)
 
-    def __str__(self):
-        return json.dumps(self.__data)
-
-    def __repr__(self):
-        return self.__data.__repr__()
-
-    def __eq__(self, rhs):
-        # return self.__data == rhs._get_data_struct
-        return repr(self) == repr(rhs)
-
+    # ================= walk implementation
     def _walk(self, entrypoint, sep):
         entrypoints = [entrypoint]
 
@@ -249,11 +181,13 @@ class SatoriImage(object):
             if not entrypoints:
                 break
 
-    def walk(self, entrypoint, **kwargs):
-        os_type = self.__data[_META_SECTION]['system']['type']
-        sep = ntsep if os_type == 'Windows' else posixsep
+    # def walk(self, entrypoint, **kwargs):
+    #     os_type = self.__data[_META_SECTION]['system']['type']
+    #     sep = ntsep if os_type == 'Windows' else posixsep
 
-        return self._walk(entrypoint, sep)
+    #     return self._walk(entrypoint, sep)
+
+    # ========== stat implementation
 
     def stat(self, file_path):
         stat_dict = self.get_attribute(file_path, 'stat')
@@ -263,12 +197,7 @@ class SatoriImage(object):
     def lstat(self, file_path):
         return self.stat(file_path)
 
-    def _get_file_attribute(self, file_path, attr):
-        fdict = __get_file_dict(file_path)
-        if attr not in fdict:
-            raise KeyError("File '{}' does not have the attribute '{}'".
-                    format(file_path, attr)
-                )
+
 
     class satori_stat_result(dict):
 
@@ -284,11 +213,3 @@ class SatoriImage(object):
                 setattr(self, stat_key, v)
 
 
-
-    '''
-from satoricore.file import load_image
-im = load_image("bin_test_image.json.gz")
-s = im.stat('/bin/bash')
-
-
-    '''
