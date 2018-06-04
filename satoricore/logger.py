@@ -13,7 +13,6 @@ LOG_LEVEL = logging.INFO
 
 class SatoriLogFormatter(logging.Formatter):
 
-
 	def __init__(self, fmt="%(levelno)s: %(msg)s", extension=False):
 		super().__init__(fmt=fmt, datefmt=None, style='%')
 		if extension:
@@ -24,7 +23,7 @@ class SatoriLogFormatter(logging.Formatter):
 		self.dbg_fmt  = colored(
 			"[@]{} %(module)s: %(lineno)d: %(msg)s"
 			.format(mod_tag),
-			"grey"
+			"grey", "on_green"
 			)
 		self.crit_fmt = colored("[X]{} %(msg)s".format(mod_tag), "red", attrs=["bold"])
 		self.err_fmt  = colored("[-]{} %(msg)s".format(mod_tag), "red")
