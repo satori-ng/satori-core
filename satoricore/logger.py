@@ -8,16 +8,19 @@ except ImportError:
 
 LOG_LEVEL = logging.INFO
 
+# Found in:
+# 'https://stackoverflow.com/questions/14844970/modifying-logging-message-format-based-on-message-logging-level-in-python3'
+
 class MyFormatter(logging.Formatter):
 
 	dbg_fmt  = colored("[@]: %(module)s: %(lineno)d: %(msg)s", "grey")
-	err_fmt  = colored("[-]: %(msg)s", "red")
-	warn_fmt = "[!] %(msg)s"
+	crit_fmt = colored("[X] %(msg)s", "red", attrs=["bold"])
+	err_fmt  = colored("[-] %(msg)s", "red")
+	warn_fmt = colored("[!] %(msg)s", "cyan")
 	info_fmt = colored("[+] %(msg)s", "green")
 
 
 	def __init__(self, fmt="%(levelno)s: %(msg)s"):
-		# logging.Formatter.__init__(self, fmt=fmt)
 		super().__init__(fmt=fmt, datefmt=None, style='%')
 
 	def format(self, record):
@@ -39,6 +42,8 @@ class MyFormatter(logging.Formatter):
 		elif record.levelno == logging.WARN:
 			self._style._fmt = MyFormatter.warn_fmt
 
+		elif record.levelno == logging.CRITICAL:
+			self._style._fmt = MyFormatter.crit_fmt
 		# Call the original formatter class to do the grunt work
 		result = logging.Formatter.format(self, record)
 
