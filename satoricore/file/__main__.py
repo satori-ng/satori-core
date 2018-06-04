@@ -4,7 +4,7 @@ import sys
 
 from satoricore.file.pickle import SatoriPickler
 from satoricore.file.json import SatoriJsoner
-from satoricore.logger import logger
+from satoricore.logger import logger, set_debug_logger
 
 
 def display_image(image):
@@ -32,6 +32,12 @@ def main():
 						action='store_true',
 						)
 
+	parser.add_argument('--debug', '-d',
+						help=("Enables debug logging"),
+						default=False,
+						action='store_true',
+						)
+
 	args = parser.parse_args()
 
 	satori_pkl = SatoriPickler()
@@ -46,6 +52,7 @@ def main():
 							satori_jsn_uncompress,
 						]
 
+	if args.debug : set_debug_logger()
 
 	for serializer in image_serializers:
 		try:
@@ -66,7 +73,7 @@ def main():
 			sys.exit(-2)
 
 		except Exception as e:
-			logger.debug(e)
+			logger.debug("{} - {}".format(serializer, e))
 
 	logger.error("File '{}' is not of a known SatoriImage format"
 		.format(
