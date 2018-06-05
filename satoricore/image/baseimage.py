@@ -22,7 +22,8 @@ class SatoriImage(object):
         'get_dir_contents',
         'get_attribute', 'set_attribute',
         'set_multiple_attributes',
-        'is_dir', 'listdir', 'lstat'
+        'is_dir', 'listdir',
+        'lstat', 'stat',
     ]
 
     def __init__(self):
@@ -30,9 +31,7 @@ class SatoriImage(object):
         self.__data[_META_SECTION] = {}
         self.__data[_DATA_SECTION] = {}
         # ===== Create the Filesystem container
-        fs_image = SatoriFileSystemImage()
-        self.__data[_DATA_SECTION]['filesystem'] = fs_image
-        expose_list(self, fs_image, self.fs_exposed)
+        self.__set_class_filesystem({})
 
         self.path = os.path     # helps with duck typing against 'os' module
         # Add a UUID in every single instance
@@ -84,8 +83,16 @@ class SatoriImage(object):
     def _get_data_struct(self):
         return self.__data
 
+    def __set_class_filesystem(self, fs_dict):
+        fs_image = SatoriFileSystemImage(
+                init_dict=fs_dict
+            )
+        self.__data[_DATA_SECTION]['filesystem'] = fs_image
+        expose_list(self, fs_image, self.fs_exposed)
+
     def _set_data_struct(self, data_struct):
         self.__data = data_struct
+        self.__set_class_filesystem(data_struct[_DATA_SECTION]['filesystem'])
 
     def set_metadata(self, attr_dict, metadata_type):
         self.__data[_META_SECTION][metadata_type] = attr_dict

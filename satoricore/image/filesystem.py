@@ -16,12 +16,21 @@ _SIZE_S = 'size'
 
 class SatoriFileSystemImage(dict):
 
+    def __init__(self, init_dict = {}):
+        super().__init__(self)
+        self.load(init_dict)
+
+    def load(self, dict_copy):
+        self.update(dict_copy.items())
+
+
+
     def add_file(self, full_path):
         with threading.Lock():
             self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
 
     def get_attribute(self, full_path, attr):
-        return self._get_file_attribute(full_path, attr)
+        return self.__get_file_dict(full_path).get(attr, {})
 
     def _get_file_attribute(self, file_path, attr):
         fdict = self.__get_file_dict(file_path)
