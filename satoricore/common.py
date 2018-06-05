@@ -73,9 +73,9 @@ def load_extension_list(extension_list):
                 'extension_{}'.format(i),
                 extension
                 )
-            logger.info("Extension '{}' loaded".format(ext_module.__name__))
+            logger.warn("Extension '{}' loaded".format(ext_module.__name__))
         except Exception as e:
-            logger.warn(
+            logger.error(
                 "[{}] - Extension {} could not be loaded".format(
                     e, extension
                 )
