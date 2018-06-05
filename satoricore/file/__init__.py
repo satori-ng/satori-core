@@ -1,4 +1,7 @@
 from satoricore.image import SatoriImage
+from satoricore.logger import logger
+
+from pickle import UnpicklingError
 
 class Serializer(object):
 	def __init__(self, compress=False, suffix=''):
@@ -58,8 +61,10 @@ def load_image(filename):
 		try:
 			image = serializer.read(filename)
 			return image
+		except (UnpicklingError, TypeError) as te:
+			logger.debug(serializer, te)
 		except Exception as e:
-			# print("[-] {}".format(e))
-			pass
+			logger.error(e)
+
 
 	raise ValueError("File {} is not in a known SatoriImage format".format(filename))
