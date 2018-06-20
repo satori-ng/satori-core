@@ -4,7 +4,7 @@ try:
 	from termcolor import colored
 except ImportError:
 	def colored(*args, **kwargs):
-		return args[0] 
+		return args[0]
 
 LOG_LEVEL = logging.INFO
 

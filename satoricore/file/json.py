@@ -26,4 +26,4 @@ class SatoriJsoner(Serializer):
 	def loads(self, content):
 		# print (type(content))
 		# print(content)
-		return json.loads(content)
+		return json.loads(content.decode('utf8'))
