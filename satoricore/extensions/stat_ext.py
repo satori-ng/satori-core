@@ -64,7 +64,7 @@ def get_stat_info(satori_image, file_path, file_type, os_context):
 
 
 @hook("differ.pre_open")
-def diff_stat_info(file_path, file_type, source, destination, results, diff_name):
+def diff_stat_info(file_path, source, destination, results, diff_name):
     s_stat = source.lstat(file_path)
     d_stat = destination.lstat(file_path)
 
