@@ -70,15 +70,15 @@ def diff_stat_info(file_path, source, destination, results, diff_name):
 
     stat_keys = set(x for x in dir(s_stat) if x.startswith('st_') ) & set(x for x in dir(d_stat) if x.startswith('st_') )
     time_keys = [ x for x in stat_keys if x.endswith('time') ]
-    # print (file_path)
+    # print (stat_keys)
     s_times_dict = {}
     d_times_dict = {}
     for time_key in time_keys:
         s_times_dict[time_key] = getattr(s_stat, time_key)
         d_times_dict[time_key] = getattr(d_stat, time_key)
 
-    time_diff_dict = {}
     diffs = {}
+    time_diff_dict = {}
     for k in stat_keys:
         try:
             s_value = getattr(s_stat, k)
