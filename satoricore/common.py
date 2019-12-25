@@ -26,7 +26,9 @@ def get_image_context_from_arg(arg, allow_local=True):
     from satoricore.file import load_image
 
     if arg == '.':
-        return dummy_context(os)
+        os_obj = os
+        expose(os_obj, os.path, 'isdir', target_name='is_dir')
+        return dummy_context(os_obj)
     if allow_local:
         try:
             os.stat(arg)
