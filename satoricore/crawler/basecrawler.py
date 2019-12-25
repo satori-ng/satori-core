@@ -99,7 +99,7 @@ class BaseCrawler:
                     # If it is a directory
                     try:
                         mode = self.image.lstat(file_full_path).st_mode
-                    except FileNotFoundError:
+                    except (FileNotFoundError, PermissionError):
                         logger.info("File '{}' could not be found"
                                 .format(file_full_path)
                             )
