@@ -3,6 +3,7 @@ The core functionalities of the Satori-NG Suite.
 
 ![logo5](https://github.com/satori-ng/Logos/blob/master/logos/light/logo5.png)
   
+![py3 tests](https://github.com/satori-ng/satori-core/workflows/py3%20tests/badge.svg)
 [![PyPI version](https://badge.fury.io/py/satori-core.svg)](https://pypi.org/project/satori-core/) - `pip install satori-core`
 
 
