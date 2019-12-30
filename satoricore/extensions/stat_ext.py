@@ -36,7 +36,7 @@ def get_stat_info(satori_image, file_path, file_type, os_context):
             points_to = "N/A"
         # print(points_to)
         satori_image.set_attribute(file_path, points_to,
-                                   'link', force_create=False)
+                                   'link', force_create=True)
 
     # print (file_stat)
     times_dict = {}
@@ -58,7 +58,7 @@ def get_stat_info(satori_image, file_path, file_type, os_context):
                     ('stat', stat_dict),
                     ('times', times_dict),
                     ('type', file_type),
-                force_create=False,
+                force_create=True,
                 )
 
 
