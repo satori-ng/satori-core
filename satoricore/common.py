@@ -25,9 +25,13 @@ def dummy_context(obj):
 def get_image_context_from_arg(arg, allow_local=True):
     from satoricore.file import load_image
 
-    if arg == '.':
+    if os.path.isdir(arg):
         os_obj = os
         expose(os_obj, os.path, 'isdir', target_name='is_dir')
+
+        os.chdir(arg)
+        expose(os_obj, os, 'listdir', target_name='get_entrypoints')
+
         return dummy_context(os_obj)
     if allow_local:
         try:
@@ -84,11 +88,22 @@ def load_extension_list(extension_list):
             )
 
 
-def expose(base, target, attr_name, target_name = None):
-    attr = getattr(target, attr_name)
-    if target_name == None:
+def expose(target, base, attr_name, target_name = None):
+    """
+        Exposes the API 'attr_name' from 'base' 
+        in 'target' object with name 'target_name'.
+
+        import os
+        'isdir' in dir(os.path)
+        True
+        expose(os, os.path, 'isdir', target_name='custom_method_to_check_directories')
+        os.custom_method_to_check_directories('/')
+        True
+    """
+    attr = getattr(base, attr_name)
+    if target_name is None:
         target_name = attr_name
-    setattr(base, target_name, attr)
+    setattr(target, target_name, attr)
 
 def expose_list(base, target, attr_list):
     for attr in attr_list:
