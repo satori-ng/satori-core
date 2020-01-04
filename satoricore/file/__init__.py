@@ -61,10 +61,10 @@ def load_image(filename):
 		try:
 			image = serializer.read(filename)
 			return image
-		except (UnpicklingError, TypeError) as te:
-			logger.debug(serializer, te)
-		except Exception as e:
-			logger.error(e)
+		except (UnpicklingError, TypeError, EOFError) as te:
+			logger.debug("Serializer: {} threw '{}'".format(serializer, te.__class__))
+		# except Exception as e:
+		# 	logger.info(e)
 
 
 	raise ValueError("File {} is not in a known SatoriImage format".format(filename))
