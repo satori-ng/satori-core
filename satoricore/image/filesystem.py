@@ -23,8 +23,6 @@ class SatoriFileSystemImage(dict):
     def load(self, dict_copy):
         self.update(dict_copy.items())
 
-
-
     def add_file(self, full_path):
         with threading.Lock():
             self.set_attribute(full_path, {}, _CONTENTS_S, force_create=True)
@@ -39,7 +37,6 @@ class SatoriFileSystemImage(dict):
                     format(file_path, attr)
                 )
         return fdict[attr]
-
 
     def set_attribute(self, full_path, attr_dict,
                       ext_name, force_create=False,
