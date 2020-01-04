@@ -42,7 +42,8 @@ class SatoriFileSystemImage(dict):
 
 
     def set_attribute(self, full_path, attr_dict,
-                      ext_name, force_create=False):
+                      ext_name, force_create=False,
+                      overwrite=False):
         """
         Adds an attribute to a file specified in the 'full_path'
         and creates it if it doesn't exist.
@@ -50,8 +51,12 @@ class SatoriFileSystemImage(dict):
         file_dict = self.__get_file_dict(full_path, force_create=force_create)
         # if ext_name not in _STANDARD_EXT:
         #     self.__data[_META_SECTION]['satori']['extensions'].append(ext_name)
-        file_dict[ext_name] = attr_dict
+        if not overwrite and ext_name in file_dict:
+            file_dict[ext_name].update(attr_dict)
+        else:
+            file_dict[ext_name] = attr_dict
         return file_dict
+
 
     def set_multiple_attributes(self, full_path,
                                 *attr_tuples,
